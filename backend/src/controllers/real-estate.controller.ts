@@ -5,21 +5,25 @@ const SHOW_PER_PAGE = 12;
 
 export default {
   getRealEstates: (req: Request, res: Response, next: NextFunction) => {
-    const { page } = req.query;
-
-    RealEstates.find()
-      .sort({ updatedAt: -1 })
-      .skip(((page || 1) - 1) * SHOW_PER_PAGE)
+    const { page, property, direction, portals } = req.query;
+    let condition = {};
+    if (portals) {
+      condition = { provider: { $in: portals.split(',') } };
+    }
+    const currentPage = page || 1;
+    RealEstates.find(condition)
+      .sort({ [property || 'updatedAt']: direction || 'desc' })
+      .skip((currentPage - 1) * SHOW_PER_PAGE)
       .limit(SHOW_PER_PAGE)
       .then(realEstates => {
-        RealEstates.find().countDocuments({}, (err, count) => {
+        RealEstates.find(condition).countDocuments({}, (err, count) => {
           const totalPages = Math.ceil(count / SHOW_PER_PAGE) || 1;
 
           const body = {
             data: realEstates,
             meta: {
               totalPages,
-              currentPage: page,
+              currentPage,
               showPerPage: SHOW_PER_PAGE,
               totalCount: count,
             },
@@ -37,13 +41,12 @@ export default {
       .catch(err => res.status(400).json(err));
   },
   postRealEstates: (req: Request, res: Response, next: NextFunction) => {
-    // @TODO: dont update not actually updated documents
     const runUpdate = (item: any) => {
       return new Promise((resolve, reject) => {
         const newItem = {
           ...item,
-          price: +item.price.replace(/[^0-9\n]/g, ''),
-          area: +item.area.replace(/[^0-9.\n]/g, ''),
+          price: convertToNumber(item.price),
+          area: convertToNumber(item.area),
           priceChangePercentage: item.priceChangePercentage
             ? +item.priceChangePercentage
                 .toString()
@@ -53,7 +56,7 @@ export default {
           new: true,
           provider: defineProviderByLink(item.link),
           createdAt: Date.now(),
-          updatedAt: Date.now(),
+          updatedAt: Date.now(), // @TODO: on new model create updatedAt confuses in sorting
         };
         RealEstates.findOne({ link: item.link })
           .then(foundItem => {
@@ -116,5 +119,20 @@ function defineProviderByLink(link: string): RealEstateProvider | null {
   if (link.indexOf('aruodas') > -1) {
     return RealEstateProvider.ARUODAS;
   }
+
+  if (link.indexOf('skelbiu') > -1) {
+    return RealEstateProvider.SKELBIU;
+  }
+
+  if (link.indexOf('kampas') > -1) {
+    return RealEstateProvider.KAMPAS;
+  }
   return null;
+}
+
+function convertToNumber(value: string): number {
+  if (value.indexOf('-') > -1) {
+    value = value.split('-')[1];
+  }
+  return +value.replace(/[^0-9\n]/g, '');
 }

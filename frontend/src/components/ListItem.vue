@@ -4,7 +4,9 @@
       <div class="media-left">
         <figure class="image is-64x64">
           <img v-if="item.provider === 0" src="../assets/images/aruodas.png" alt="Image" />
-          <img v-if="item.provider === 1" src="../assets/images/domoplius.svg" alt="Image" />
+          <img v-else-if="item.provider === 1" src="../assets/images/domoplius.svg" alt="Image" />
+          <img v-else-if="item.provider === 2" src="../assets/images/skelbiu.png" alt="Image" />
+          <img v-else-if="item.provider === 3" src="../assets/images/kampas.svg" alt="Image" />
         </figure>
       </div>
       <div class="media-content is-flex-tablet justify-content-between align-items-center">
