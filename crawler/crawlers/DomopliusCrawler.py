@@ -12,6 +12,7 @@ class DomopliusCrawler(Crawler):
             item_container = container.find("div", {"class": "item-section"})
             title = item_container.h2.a.text.strip()
             link = item_container.h2.a["href"]
+            image_url = container.img["src"]
 
             param_container = item_container.find("div", {"class": "param-list"})
 
@@ -21,6 +22,9 @@ class DomopliusCrawler(Crawler):
             price = price_container.strong.text.strip()
 
             real_estates.append(
-                RealEstate(title, link, price, area, None).to_json())
+                RealEstate(title, link, price, area, None, image_url).to_json())
 
         return real_estates
+
+    def create_url(self, price_min, price_max):
+        return f"https://domoplius.lt/skelbimai/namai-kotedzai-sodai?action_type=1&address_1=461&sell_price_from={price_min}&sell_price_to={price_max}"

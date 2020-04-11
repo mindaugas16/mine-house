@@ -1,11 +1,5 @@
 import { Document, model, Schema } from 'mongoose';
-
-export enum RealEstateProvider {
-  ARUODAS,
-  DOMOPLIUS,
-  SKELBIU,
-  KAMPAS,
-}
+import { PortalInterface } from './portal.model';
 
 export interface RealEstateInterface extends Document {
   title: string;
@@ -16,13 +10,17 @@ export interface RealEstateInterface extends Document {
   priceChange: number;
   priceChangePercentage: number;
   new: boolean;
-  provider: RealEstateProvider;
+  portal: PortalInterface;
   lastSeenAt: number;
   lastPriceChanges: {
     priceChangeFrom: number;
     priceChangeTo: number;
     changedAt: Date;
   }[];
+  imagePath: string;
+  createdAt: Date;
+  updatedAt: Date;
+  starred: boolean;
 }
 
 const realEstateSchema = new Schema({
@@ -54,8 +52,14 @@ const realEstateSchema = new Schema({
   new: {
     type: Boolean,
   },
-  provider: {
-    type: Number,
+  starred: {
+    type: Boolean,
+    default: false,
+  },
+  portal: {
+    type: Schema.Types.ObjectId,
+    ref: 'Portal',
+    required: true,
   },
   lastSeenAt: {
     type: Date,
@@ -69,6 +73,11 @@ const realEstateSchema = new Schema({
   lastPriceChanges: {
     type: Array,
     default: [],
+  },
+  imagePath: {
+    type: String,
+    unique: true,
+    sparse: true,
   },
 });
 

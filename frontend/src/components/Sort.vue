@@ -27,6 +27,23 @@ import router from '../router';
 
 export default {
   name: 'ListSort',
+  data: () => {
+    return {
+      sort: {
+        direction: 'desc',
+        property: 'updatedAt',
+      },
+    };
+  },
+  created() {
+    const { direction, property } = this.$route.query;
+    if (direction) {
+      this.sort.direction = direction;
+    }
+    if (property) {
+      this.sort.direction = property;
+    }
+  },
   methods: {
     onChangeProperty(event) {
       this.sort.property = event.target.value;
@@ -45,23 +62,6 @@ export default {
 
       router.replace({ path: '', query: { ...this.$route.query, direction, property } });
     },
-  },
-  data: () => {
-    return {
-      sort: {
-        direction: 'desc',
-        property: 'updatedAt',
-      },
-    };
-  },
-  created() {
-    const { direction, property } = this.$route.query;
-    if (direction) {
-      this.sort.direction = direction;
-    }
-    if (property) {
-      this.sort.direction = property;
-    }
   },
 };
 </script>

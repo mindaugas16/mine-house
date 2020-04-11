@@ -1,5 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import RealEstates, { RealEstateInterface, RealEstateProvider } from '../models/real-estate.model';
+import RealEstates, { RealEstateInterface } from '../models/real-estate.model';
+import Portals from '../models/portal.model';
+import { download } from '../utilities/downloader';
+import crypto from 'crypto-js';
 
 const SHOW_PER_PAGE = 12;
 
@@ -15,6 +18,7 @@ export default {
       .sort({ [property || 'updatedAt']: direction || 'desc' })
       .skip((currentPage - 1) * SHOW_PER_PAGE)
       .limit(SHOW_PER_PAGE)
+      .populate('portal')
       .then(realEstates => {
         RealEstates.find(condition).countDocuments({}, (err, count) => {
           const totalPages = Math.ceil(count / SHOW_PER_PAGE) || 1;
@@ -33,17 +37,33 @@ export default {
       })
       .catch(err => res.status(400).json(err));
   },
+  markAsStarred: (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const { starred } = req.body;
+
+    RealEstates.findOneAndUpdate({ _id: id }, { starred }, { new: true })
+      .then(item => res.status(204).send())
+      .catch(err => res.status(400).json(err));
+  },
   markAsSeen: (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
 
-    RealEstates.findOneAndUpdate({ _id: id }, { new: false, lastSeenAt: Date.now() })
-      .then(item => res.send(item))
+    RealEstates.findOneAndUpdate({ _id: id }, { new: false, lastSeenAt: Date.now() }, { new: true })
+      .then(item => {
+        if (!item) {
+          throw new Error(`Unable to find real estate with id ${id}`);
+        }
+        return res.send({ _id: item._id, new: item.new, lastSeenAt: item.lastSeenAt });
+      })
       .catch(err => res.status(400).json(err));
   },
   postRealEstates: (req: Request, res: Response, next: NextFunction) => {
-    const runUpdate = (item: any) => {
-      return new Promise((resolve, reject) => {
-        const newItem = {
+    function runUpdate(item: any) {
+      return new Promise(async (resolve, reject) => {
+        const portalLink = definePortalByLink(item.link);
+        const portal = await Portals.findOne({ link: { $regex: portalLink, $options: 'i' } });
+
+        const newItem: RealEstateInterface = {
           ...item,
           price: convertToNumber(item.price),
           area: convertToNumber(item.area),
@@ -54,13 +74,22 @@ export default {
                 .replace(/[^0-9.\n]/g, '')
             : null,
           new: true,
-          provider: defineProviderByLink(item.link),
+          portal: portal ? portal._id : null,
           createdAt: Date.now(),
-          updatedAt: Date.now(), // @TODO: on new model create updatedAt confuses in sorting
+          updatedAt: Date.now(), // @TODO: on new model create updatedAt confuses in sorting, remove this line
         };
         RealEstates.findOne({ link: item.link })
           .then(foundItem => {
             if (!foundItem) {
+              if (item.imageUrl) {
+                const filename = crypto.MD5(`${newItem.title}${newItem.createdAt}`);
+                const fileExtension = item.imageUrl.split('.').pop();
+
+                const imagePath = `images/real-estates/${filename}.${fileExtension}`;
+
+                download(item.imageUrl, imagePath, () => {});
+                newItem.imagePath = imagePath;
+              }
               return resolve(new RealEstates(newItem).save());
             }
             let body = {};
@@ -97,7 +126,7 @@ export default {
             reject(err);
           });
       });
-    };
+    }
 
     const realEstates: RealEstateInterface[] = req.body;
 
@@ -111,23 +140,13 @@ export default {
   },
 };
 
-function defineProviderByLink(link: string): RealEstateProvider | null {
-  if (link.indexOf('domoplius') > -1) {
-    return RealEstateProvider.DOMOPLIUS;
+function definePortalByLink(link: string): string {
+  // @TODO: update regex to cover www. and other url cases https://nodejs.org/api/url.html
+  const matches = link.replace('www.', '').match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+  if (!(matches && matches.length)) {
+    throw new Error('Unable identify portal');
   }
-
-  if (link.indexOf('aruodas') > -1) {
-    return RealEstateProvider.ARUODAS;
-  }
-
-  if (link.indexOf('skelbiu') > -1) {
-    return RealEstateProvider.SKELBIU;
-  }
-
-  if (link.indexOf('kampas') > -1) {
-    return RealEstateProvider.KAMPAS;
-  }
-  return null;
+  return matches[1];
 }
 
 function convertToNumber(value: string): number {

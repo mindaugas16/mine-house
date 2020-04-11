@@ -13,6 +13,7 @@ class AruodasCrawler(Crawler):
                 continue
 
             title = container.img["alt"]
+            image_url = container.img["src"]
             address_container = container.find("td", {"class": "list-adress"})
             link = address_container.a["href"]
 
@@ -23,6 +24,9 @@ class AruodasCrawler(Crawler):
             price = price_container.find("span", {"class": "list-item-price"}).text.strip()
 
             real_estates.append(
-                RealEstate(title, link, price, area, building_status).to_json())
+                RealEstate(title, link, price, area, building_status, image_url).to_json())
 
         return real_estates
+
+    def create_url(self, price_min, price_max):
+        return f"https://www.aruodas.lt/namai/vilniuje/?FPriceMin={price_min}&FPriceMax={price_max}&FOrder=AddDate&FRegionArea=462"

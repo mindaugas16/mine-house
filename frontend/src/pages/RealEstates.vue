@@ -1,13 +1,13 @@
 <template>
   <div class="container">
     <div class="section">
-      <div class="is-flex justify-content-between">
-<!--        @TODO: fix on mobile view-->
-        <div class="is-flex">
+      <div class="is-flex justify-content-between flex-column-mobile">
+        <!--        @TODO: fix on mobile view-->
+        <div class="is-flex flex-column-mobile">
           <ListSort class="mr-3"></ListSort>
           <ListFilter></ListFilter>
         </div>
-        <button class="button is-primary" @click="onRunCrawler" :disabled="loadingCrawler" :class="{ 'is-loading': loadingCrawler }">
+        <button class="button is-primary" :class="{ 'is-loading': loadingCrawler }" :disabled="loadingCrawler" @click="onRunCrawler">
           <span class="icon">
             <i class="fa fa-refresh"></i>
           </span>
@@ -22,22 +22,19 @@
       </div>
     </div>
     <div class="section">
-      <Pagination
-        v-if="realEstatesMeta && !loading && realEstates && realEstates.length"
-        :meta="realEstatesMeta"
-        @change="fetchRealEstates"
-      ></Pagination>
+      <Pagination v-if="realEstatesMeta && !loading && realEstates && realEstates.length" :meta="realEstatesMeta"></Pagination>
     </div>
   </div>
 </template>
 
 <script>
-import ListSort from '../components/ListSort';
+import ListSort from '../components/Sort';
 import Pagination from '../components/Pagination';
 import List from '../components/List';
 import axios from 'axios';
 import ListFilter from '../components/Filter';
 import Loader from '../components/ui/Loader';
+import { mapActions, mapGetters } from 'vuex';
 
 export default {
   name: 'RealEstates',
@@ -48,28 +45,31 @@ export default {
     List,
     ListFilter,
   },
+  data() {
+    return {
+      loadingCrawler: false,
+    };
+  },
+  computed: mapGetters(['realEstates', 'realEstatesMeta', 'loading']),
+  watch: {
+    $route: 'getRealEstates',
+  },
+  created() {
+    this.getRealEstates();
+  },
   methods: {
-    fetchRealEstates(route) {
-      this.loading = true;
+    ...mapActions(['fetchRealEstates']),
+    getRealEstates(route = this.$route) {
       const { direction, page, property, portals } = route.query;
-      axios
-        .get('http://localhost:3000/api/real-estate', { params: { direction, page, property, portals } })
-        .then(({ data }) => {
-          this.realEstates = data.data;
-          this.realEstatesMeta = data.meta;
-          this.loading = false;
-        })
-        .catch(err => {
-          this.loading = false;
-          console.error(err);
-        });
+      const queryParams = { direction, page, property, portals };
+      this.fetchRealEstates(queryParams);
     },
     onRunCrawler() {
       this.loadingCrawler = true;
       axios
         .post('http://localhost:3000/api/run-crawler', {})
         .then(() => {
-          this.fetchRealEstates(this.$route);
+          this.getRealEstates();
           this.loadingCrawler = false;
         })
         .catch(err => {
@@ -77,20 +77,6 @@ export default {
           console.error(err);
         });
     },
-  },
-  data() {
-    return {
-      realEstates: [],
-      realEstatesMeta: null,
-      loadingCrawler: false,
-      loading: false,
-    };
-  },
-  mounted() {
-    this.fetchRealEstates(this.$route);
-  },
-  watch: {
-    $route: 'fetchRealEstates',
   },
 };
 </script>

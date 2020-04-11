@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ListItem v-for="item in realEstates" v-bind:key="item._id" v-bind:item="item"></ListItem>
+    <ListItem v-for="item in realEstates" :key="item._id" :item="item"></ListItem>
   </div>
 </template>
 
@@ -13,7 +13,10 @@ export default {
     ListItem,
   },
   props: {
-    realEstates: Array,
+    realEstates: {
+      type: Array,
+      default: () => [],
+    },
   },
 };
 </script>

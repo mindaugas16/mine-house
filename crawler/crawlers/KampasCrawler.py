@@ -15,6 +15,9 @@ class KampasCrawler(Crawler):
             area = param_data[1].text.strip()
             price = container.find("p", {"class": "third-line"}).text.strip()
             real_estates.append(
-                RealEstate(title, link, price, area, None).to_json())
+                RealEstate(title, link, price, area, None, None).to_json())
 
         return real_estates
+
+    def create_url(self, price_min, price_max):
+        return f"https://www.kampas.lt/namai-vilniuje?priceFrom={price_min}&priceTo={price_max}"

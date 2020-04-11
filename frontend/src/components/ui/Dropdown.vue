@@ -1,5 +1,5 @@
 <template>
-  <div class="dropdown" :class="{ 'is-active': isOpen }" v-click-outside="hide">
+  <div v-click-outside="hide" class="dropdown" :class="{ 'is-active': isOpen }">
     <div class="dropdown-trigger">
       <button class="button" aria-haspopup="true" aria-controls="dropdown-menu" @click="isOpen = !isOpen">
         <slot name="button"></slot>
@@ -8,7 +8,7 @@
         </span>
       </button>
     </div>
-    <div class="dropdown-menu" id="dropdown-menu" role="menu">
+    <div id="dropdown-menu" class="dropdown-menu" role="menu">
       <div class="dropdown-content">
         <slot name="content"></slot>
       </div>
@@ -19,17 +19,6 @@
 <script>
 export default {
   name: 'Dropdown',
-  data() {
-    return {
-      isOpen: false,
-      clickOutsideFn: {},
-    };
-  },
-  methods: {
-    hide() {
-      this.isOpen = false;
-    },
-  },
   directives: {
     clickOutside: (() => {
       let state = {};
@@ -47,6 +36,17 @@ export default {
         },
       };
     })(),
+  },
+  data() {
+    return {
+      isOpen: false,
+      clickOutsideFn: {},
+    };
+  },
+  methods: {
+    hide() {
+      this.isOpen = false;
+    },
   },
 };
 </script>

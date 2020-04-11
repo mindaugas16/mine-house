@@ -1,21 +1,26 @@
 <template>
-  <div class="box is-shadowless" v-bind:class="{ 'box--new': item.new }">
-    <div class="media">
-      <div class="media-left">
-        <figure class="image is-64x64">
-          <img v-if="item.provider === 0" src="../assets/images/aruodas.png" alt="Image" />
-          <img v-else-if="item.provider === 1" src="../assets/images/domoplius.svg" alt="Image" />
-          <img v-else-if="item.provider === 2" src="../assets/images/skelbiu.png" alt="Image" />
-          <img v-else-if="item.provider === 3" src="../assets/images/kampas.svg" alt="Image" />
+  <div class="box" :class="{ 'box--new': item.new }">
+    <div class="is-flex">
+      <div class="media-left is-relative">
+        <div class="buttons align-items-start">
+          <button class="button button--favorite" :class="{ starred: item.starred }" @click="onMarkAsStarred()">
+            <span class="icon">
+              <i class="fa fa-star fa-lg"></i>
+            </span>
+          </button>
+          <span v-if="!item.lastSeenAt" class="tag is-success">Naujas</span>
+        </div>
+        <figure class="real-estate-image image">
+          <img v-if="item.imagePath" :src="'http://localhost:3000/api/assets/' + item.imagePath" alt="Image" />
+          <img v-else src="@/assets/placeholder.png" alt="Image" />
         </figure>
       </div>
       <div class="media-content is-flex-tablet justify-content-between align-items-center">
         <div class="content">
-          <h5>
-            {{ item.title }}
-          </h5>
-
           <div>
+            <a :href="item.link" target="_blank" rel="noreferrer" class="link" @click="onMarkAsSeen()">
+              {{ item.title }}
+            </a>
             <div class="is-flex">
               <div class="details-block">
                 <span class="icon">
@@ -28,7 +33,7 @@
                   <span class="icon">
                     <i
                       class="fa"
-                      v-bind:class="item.priceChange ? ['fa-arrow-up', 'has-text-success'] : ['fa-arrow-down', 'has-text-danger']"
+                      :class="item.priceChange ? ['fa-arrow-up', 'has-text-success'] : ['fa-arrow-down', 'has-text-danger']"
                     ></i>
                   </span>
                   {{ item.priceChangePercentage | percentage }}
@@ -40,43 +45,32 @@
                 </span>
                 {{ item.area | squareMeters }}
               </div>
-              <div class="details-block" v-if="item.buildingStatus">
+              <div v-if="item.buildingStatus" class="details-block">
                 <span class="icon">
                   <i class="fa fa-paint-brush"></i>
                 </span>
                 {{ item.buildingStatus }}
               </div>
             </div>
+          </div>
+
+          <div class="is-flex flex-column justify-content-between">
             <div class="is-flex flex-column">
-              <small class="is-size-7 has-text-grey"> Pridėta: {{ item.createdAt | date }} </small>
-              <small class="is-size-7 has-text-grey" v-if="!isSameDates()"> Paskutinį kartą atnaujinta: {{ item.updatedAt | date }} </small>
+              <small class="is-size-7 has-text-grey"> Pridėta {{ item.createdAt | ago }} </small>
+              <small v-if="!isSameDates()" class="is-size-7 has-text-grey"> Paskutinį kartą atnaujinta {{ item.updatedAt | ago }} </small>
+              <small v-if="item.lastSeenAt" class="is-size-7 has-text-grey"> Paskutinį kartą žiūrėta {{ item.lastSeenAt | ago }} </small>
             </div>
           </div>
         </div>
-        <div class="is-flex flex-column">
-          <div class="field has-addons">
-            <p class="control">
-              <a class="button" :href="item.link" target="_blank" rel="noreferrer" @click="onMarkAsSeen()">Peržiūrėti</a>
-            </p>
-            <div class="control">
-              <div class="dropdown is-right" :class="{ 'is-active': isOpenDropdown }">
-                <div class="dropdown-trigger">
-                  <button class="button" aria-haspopup="true" aria-controls="dropdown-menu2" @click="isOpenDropdown = !isOpenDropdown" disabled>
-                    <span class="icon is-small">
-                      <i class="fa fa-angle-down" aria-hidden="true"></i>
-                    </span>
-                  </button>
-                </div>
-                <div class="dropdown-menu" id="dropdown-menu2" role="menu">
-                  <div class="dropdown-content">
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <small class="is-size-7 has-text-grey-light">
-            {{ item.lastSeenAt | date }}
-          </small>
+        <div class="is-flex">
+          <figure class="image">
+            <img
+              v-if="item.portal.imagePath"
+              :src="'http://localhost:3000/api/assets/' + item.portal.imagePath"
+              alt="Image"
+              class="portal-image"
+            />
+          </figure>
         </div>
       </div>
     </div>
@@ -84,19 +78,11 @@
 </template>
 
 <script>
-import axios from 'axios';
 import moment from 'moment';
+import { mapActions } from 'vuex';
 
 export default {
   name: 'ListItem',
-  props: {
-    item: Object,
-  },
-  data() {
-    return {
-      isOpenDropdown: false,
-    };
-  },
   filters: {
     squareMeters: function (value) {
       return `${value} m²`;
@@ -112,11 +98,30 @@ export default {
         return moment(String(value)).format('MM/DD/YYYY hh:mm');
       }
     },
+    ago: function (value) {
+      if (value) {
+        return moment(value).fromNow();
+      }
+    },
+  },
+  props: {
+    item: {
+      type: Object,
+      default: null,
+    },
+  },
+  data() {
+    return {
+      isOpenDropdown: false,
+    };
   },
   methods: {
+    ...mapActions(['markAsSeen', 'markAsStarred']),
     onMarkAsSeen() {
-      // @TODO; avoid prop mutation, but have to solve issue when trying update item from response
-      axios.patch(`http://localhost:3000/api/real-estate/${this.item._id}`, {}).then();
+      this.markAsSeen(this.item._id);
+    },
+    onMarkAsStarred() {
+      this.markAsStarred({ id: this.item._id, starred: !this.item.starred });
     },
     isSameDates() {
       return moment(this.item.createdAt).isSame(moment(this.item.updatedAt));
@@ -127,14 +132,78 @@ export default {
 
 <style scoped lang="scss">
 .box {
-  border-radius: 0;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 7px 10px rgba(0, 0, 0, 0.05);
+
+  .real-estate-image {
+    img {
+      height: 200px;
+      width: auto;
+    }
+  }
+
+  .link {
+    font-size: 1.2em;
+    color: black;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .portal-image {
+    height: 35px;
+    width: auto;
+    max-width: 100px;
+  }
 
   &--new {
-    background-color: #e2eff1;
   }
 
   .details-block:not(:last-child) {
     margin-right: 20px;
+  }
+
+  .media-left {
+    margin: -1.25rem;
+    margin-right: 1rem;
+  }
+
+  .media-content {
+    .content {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      display: flex;
+      flex-flow: column;
+      justify-content: space-between;
+    }
+  }
+
+  .buttons {
+    top: 10px;
+    left: 10px;
+    position: absolute;
+    z-index: 1;
+
+    .button {
+      border: 0;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 50%;
+      color: white;
+
+      &--favorite {
+        transition: background 200ms;
+
+        &.starred {
+          color: yellow;
+        }
+      }
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.4);
+      }
+    }
   }
 }
 </style>
