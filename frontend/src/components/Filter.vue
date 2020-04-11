@@ -4,12 +4,12 @@
       <template v-slot:button>
         <p>
           <span>Portalai</span>
-          <span v-if="isSomeSelected">: {{ portals.filter(item => item.isSelected).map(item => item.label) | join(3) }}</span>
+          <span v-if="isSomeSelected">: {{ filteredPortals | join(3) }}</span>
         </p>
       </template>
       <template v-slot:content>
         <label v-for="portal in portals" :key="portal._id" class="checkbox dropdown-item">
-          <input type="checkbox" @change="onChange" />
+          <input type="checkbox" :value="portal.name" v-model="selectedPortals" @change="onChange" />
           {{ portal.title }}
         </label>
       </template>
@@ -42,6 +42,7 @@ export default {
   data() {
     return {
       portals: [],
+      selectedPortals: [],
     };
   },
   computed: {
@@ -50,6 +51,9 @@ export default {
     },
     isEverySelected: function () {
       return this.portals.every(({ isSelected }) => !!isSelected);
+    },
+    filteredPortals: function () {
+      return this.portals.filter(item => item.isSelected).map(item => item.label);
     },
   },
   created() {
@@ -67,9 +71,7 @@ export default {
     },
     onChange() {
       this.debounce(() => {
-        const selectedPortals = this.portals.filter(portal => portal.isSelected);
-        const reducedPortals = selectedPortals.length ? selectedPortals.map(({ id }) => id).join() : undefined;
-
+        const reducedPortals = this.selectedPortals.length ? this.selectedPortals.join() : undefined;
         this.appendToRoute(reducedPortals);
       });
     },

@@ -11,7 +11,7 @@ export default {
     const { page, property, direction, portals } = req.query;
     let condition = {};
     if (portals) {
-      condition = { provider: { $in: portals.split(',') } };
+      condition = { 'portal.name': 'aruodas' };
     }
     const currentPage = page || 1;
     RealEstates.find(condition)
