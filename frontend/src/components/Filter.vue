@@ -4,17 +4,17 @@
       <template v-slot:button>
         <p>
           <span>Portalai</span>
-          <span v-if="isSomeSelected">: {{ filteredPortals | join(3) }}</span>
+          <span v-if="selectedPortals.length">: {{ selectedPortalsNames | join(3) }}</span>
         </p>
       </template>
       <template v-slot:content>
-        <label v-for="portal in portals" :key="portal._id" class="checkbox dropdown-item">
-          <input type="checkbox" :value="portal.name" v-model="selectedPortals" @change="onChange" />
-          {{ portal.title }}
+        <label v-for="portal in portals" :key="portal.id" class="checkbox dropdown-item">
+          <input v-model="selectedPortals" type="checkbox" :value="portal.name" @change="onChange" />
+          {{ portal.title }} ({{ portal.realEstatesCount }})
         </label>
       </template>
     </Dropdown>
-    <button v-if="!isEverySelected" class="button is-text ml-3 is-small" @click="onClearFilters()">
+    <button v-if="isFiltersChanged" class="button is-text ml-3 is-small" @click="onClearFilters()">
       <span class="icon is-small">
         <i class="fa fa-remove" aria-hidden="true"></i>
       </span>
@@ -46,33 +46,40 @@ export default {
     };
   },
   computed: {
-    isSomeSelected: function () {
-      return this.portals.some(({ isSelected }) => !!isSelected);
+    selectedPortalsNames() {
+      return this.selectedPortals.map(portal => {
+        const found = this.portals.find(({ name }) => name === portal);
+        return found.title;
+      });
     },
-    isEverySelected: function () {
-      return this.portals.every(({ isSelected }) => !!isSelected);
-    },
-    filteredPortals: function () {
-      return this.portals.filter(item => item.isSelected).map(item => item.label);
+    isFiltersChanged() {
+      return this.selectedPortals.length !== this.portals.length;
     },
   },
-  created() {
-    axios
-      .get('http://localhost:3000/api/portals')
-      .then(({ data }) => {
-        this.portals = data;
-      })
-      .catch(err => console.error(err));
+  async created() {
+    try {
+      const { data } = await axios.get('http://localhost:3000/api/portals');
+      this.portals = data;
+    } catch (err) {
+      console.error(err);
+    }
+    if (this.$route.query.portals) {
+      this.selectedPortals = this.$route.query.portals.split(',');
+    } else {
+      this.resetFilters();
+    }
   },
   methods: {
     onClearFilters() {
-      this.portals.forEach(portal => (portal.isSelected = true));
+      this.resetFilters();
       this.appendToRoute();
+    },
+    resetFilters() {
+      this.selectedPortals = this.portals.map(({ name }) => name);
     },
     onChange() {
       this.debounce(() => {
-        const reducedPortals = this.selectedPortals.length ? this.selectedPortals.join() : undefined;
-        this.appendToRoute(reducedPortals);
+        this.appendToRoute(this.selectedPortals.join());
       });
     },
     appendToRoute(portals) {

@@ -1,25 +1,38 @@
 version: '3'
 
 volumes:
-  mongodb_volume:
+  postgres:
+#  mongodb_volume:
 
 services:
-  backend:
-    build: backend/
-    restart: always
-    environment:
-      - TZ=Europe/Vilnius
-      - MONGO_DB_ADDR=mongodb
-      - MONGO_DB_PORT=27017
-    ports:
-      - 3000:3000
+#  backend:
+#    build: backend/
+#    restart: always
+#    environment:
+#      - TZ=Europe/Vilnius
+#      - MONGO_DB_ADDR=mongodb
+#      - MONGO_DB_PORT=27017
+#    ports:
+#      - 3000:3000
 
-  mongodb:
-    image: mongo:latest
-    volumes:
-      - mongodb_volume:/data/db
+  postgres:
+    image: postgres
     environment:
-      - TZ=Europe/Vilnius
-    restart: always
+      POSTGRES_DB: realestates
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres:/var/lib/postgresql/data
     ports:
-      - 27017:27017
+      - 5432:5432
+    restart: always
+
+#  mongodb:
+#    image: mongo:latest
+#    volumes:
+#      - mongodb_volume:/data/db
+#    environment:
+#      - TZ=Europe/Vilnius
+#    restart: always
+#    ports:
+#      - 27017:27017

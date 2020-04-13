@@ -10,19 +10,31 @@ export default {
   actions: {
     async fetchRealEstates({ commit }, params) {
       commit(LOADING, true);
-      const { data } = await axios.get('http://localhost:3000/api/real-estates', { params });
-      const { data: realEstates, meta: realEstatesMeta } = data;
-      commit(UPDATE_REAL_ESTATES, realEstates);
-      commit(UPDATE_REAL_ESTATES_META, realEstatesMeta);
+      try {
+        const { data } = await axios.get('http://localhost:3000/api/real-estates', { params });
+        const { data: realEstates, meta: realEstatesMeta } = data;
+        commit(UPDATE_REAL_ESTATES, realEstates);
+        commit(UPDATE_REAL_ESTATES_META, realEstatesMeta);
+      } catch (err) {
+        console.error(err);
+      }
       commit(LOADING, false);
     },
     async markAsSeen({ commit }, id) {
-      const { data: values } = await axios.patch(`http://localhost:3000/api/real-estates/${id}/mark-as-seen`, {});
-      commit(UPDATE_REAL_ESTATE, { id, values });
+      try {
+        const { data: values } = await axios.patch(`http://localhost:3000/api/real-estates/${id}/mark-as-seen`, {});
+        commit(UPDATE_REAL_ESTATE, { id, values });
+      } catch (err) {
+        console.error(err);
+      }
     },
     async markAsStarred({ commit }, { id, starred }) {
-      await axios.patch(`http://localhost:3000/api/real-estates/${id}/mark-as-starred`, { starred });
-      commit(UPDATE_REAL_ESTATE, { id, values: { starred } });
+      try {
+        await axios.patch(`http://localhost:3000/api/real-estates/${id}/mark-as-starred`, { starred });
+        commit(UPDATE_REAL_ESTATE, { id, values: { starred } });
+      } catch (err) {
+        console.error(err);
+      }
     },
   },
   mutations: {
@@ -37,10 +49,9 @@ export default {
     },
     [UPDATE_REAL_ESTATE](state, { id, values }) {
       state.realEstates = state.realEstates.map(item => {
-        if (item._id !== id) {
+        if (item.id !== id) {
           return item;
         }
-
         return {
           ...item,
           ...values,

@@ -1,13 +1,10 @@
 import express from 'express';
 import http from 'http';
 import bodyParser from 'body-parser';
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
 import cors from './middleware/cors';
 import errorHandler from './middleware/error-handler';
 import routes from './routes';
-
-dotenv.config();
+import sequelize from './utilities/db';
 
 const app = express();
 
@@ -16,8 +13,9 @@ app.use(cors);
 app.use(errorHandler);
 app.use('/api', routes);
 
-mongoose
-  .connect(process.env.DATABASE_URL as string, { useNewUrlParser: true, useUnifiedTopology: true })
+sequelize
+  // .sync({ force: true })
+  .authenticate()
   .then(() => {
     const server = http.createServer(app);
 

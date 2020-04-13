@@ -1,36 +1,50 @@
-import { model, Schema, Document } from 'mongoose';
+import { BuildOptions, DataTypes, Model } from 'sequelize';
+import sequelize from '../utilities/db';
+import RealEstate from './real-estate.model';
 
-export interface PortalInterface extends Document {
+export interface PortalInterface extends Model {
+  id: number;
   title: string;
   link: string;
-  totalResults?: number;
+  realEstatesCount?: number;
   imagePath: string;
   active: boolean;
   name: string;
 }
 
-const schema = new Schema({
+type ModelStatic = typeof Model & {
+  new (values?: object, options?: BuildOptions): PortalInterface;
+}
+
+const Portal = <ModelStatic>sequelize.define('portals', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    allowNull: false,
+    primaryKey: true,
+  },
   title: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
     unique: true,
   },
   name: {
-    type: String,
-    required: true,
+    type: DataTypes.STRING,
+    allowNull: false,
     unique: true,
   },
   link: {
-    type: String,
+    type: DataTypes.STRING,
     unique: true,
   },
   imagePath: {
-    type: String,
+    type: DataTypes.STRING,
   },
   active: {
-    type: Boolean,
-    default: true,
+    type: DataTypes.BOOLEAN,
+    defaultValue: true,
   },
 });
 
-export default model<PortalInterface>('Portal', schema);
+
+export default Portal;

@@ -57,7 +57,7 @@
           <div class="is-flex flex-column justify-content-between">
             <div class="is-flex flex-column">
               <small class="is-size-7 has-text-grey"> Pridėta {{ item.createdAt | ago }} </small>
-              <small v-if="!isSameDates()" class="is-size-7 has-text-grey"> Paskutinį kartą atnaujinta {{ item.updatedAt | ago }} </small>
+              <small v-if="item.updatedAt" class="is-size-7 has-text-grey"> Paskutinį kartą atnaujinta {{ item.updatedAt | ago }} </small>
               <small v-if="item.lastSeenAt" class="is-size-7 has-text-grey"> Paskutinį kartą žiūrėta {{ item.lastSeenAt | ago }} </small>
             </div>
           </div>
@@ -118,13 +118,10 @@ export default {
   methods: {
     ...mapActions(['markAsSeen', 'markAsStarred']),
     onMarkAsSeen() {
-      this.markAsSeen(this.item._id);
+      this.markAsSeen(this.item.id);
     },
     onMarkAsStarred() {
-      this.markAsStarred({ id: this.item._id, starred: !this.item.starred });
-    },
-    isSameDates() {
-      return moment(this.item.createdAt).isSame(moment(this.item.updatedAt));
+      this.markAsStarred({ id: this.item.id, starred: !this.item.starred });
     },
   },
 };
