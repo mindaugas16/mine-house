@@ -4,7 +4,7 @@ import * as moment from 'moment';
 
 import router from './router';
 import store from './store/index';
-require('./assets/scss/main.scss');
+import './assets/scss/main.scss';
 
 moment.locale('lt');
 

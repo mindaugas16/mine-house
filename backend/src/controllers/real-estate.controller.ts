@@ -3,21 +3,26 @@ import RealEstate, { RealEstateInterface } from '../models/real-estate.model';
 import Portal from '../models/portal.model';
 import { download } from '../utilities/downloader';
 import crypto from 'crypto-js';
-import { Op } from 'sequelize';
+import { Op, Sequelize } from 'sequelize';
 
 const SHOW_PER_PAGE = 12;
 
 export default {
   getRealEstates: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { page, property, direction, portals } = req.query;
+      const { page, property, direction, portals, groupBy } = req.query;
       let portalCondition = {};
+      let order: any[] = [];
       if (portals) {
-        portalCondition = { 'name': portals.split(',') };
+        portalCondition = { name: portals.split(',') };
       }
+      if (groupBy) {
+        order.push([groupBy, 'desc']);
+      }
+      order.push([[property || 'updatedAt', direction || 'desc']]);
       const currentPage = page || 1;
       const { rows, count } = await RealEstate.findAndCountAll({
-        order: [[property || 'updatedAt', direction || 'desc']],
+        order,
         limit: SHOW_PER_PAGE,
         offset: (currentPage - 1) * SHOW_PER_PAGE,
         include: [
@@ -107,19 +112,20 @@ export default {
           }
           let body = {};
           if (foundItem.price !== newItem.price) {
-            const priceChangePercentage = ((foundItem.price - newItem.price) * 100) / foundItem.price;
+            const priceChangePercentage = +(((foundItem.price - newItem.price) * 100) / foundItem.price).toFixed(2);
             body = {
               ...body,
               price: newItem.price,
-              priceChangePercentage: Math.abs(+priceChangePercentage.toFixed(2)),
-              priceChange: priceChangePercentage > 0 ? 0 : 1,
-              // $push: {
-              //   lastPriceChanges: {
-              //     priceChangeFrom: foundItem.price,
-              //     priceChangeTo: newItem.price,
-              //     changedAt: Date.now(),
-              //   },
-              // },
+              lastPriceChanges: Sequelize.fn(
+                'array_append',
+                Sequelize.col('lastPriceChanges'),
+                JSON.stringify({
+                  priceBefore: foundItem.price,
+                  priceAfter: newItem.price,
+                  priceChangePercentage,
+                  changedAt: Date.now(),
+                })
+              ),
             };
           }
 
@@ -130,7 +136,7 @@ export default {
           if (!Object.keys(body).length) {
             return resolve();
           }
-          body = { ...body, updatedAt: Date.now() };
+          body = { ...body, updatedAt: Date.now(), lastSeenAt: null };
           const found = await RealEstate.update(body, { where: { link: item.link } });
           resolve(found);
         } catch (err) {
@@ -163,6 +169,12 @@ function definePortalByLink(link: string): string {
 function convertToNumber(value: string): number {
   if (value.indexOf('-') > -1) {
     value = value.split('-')[1];
+  }
+  if (value.indexOf(',') > -1) {
+    value = value.split(',')[0];
+  }
+  if (value.indexOf('.') > -1) {
+    value = value.split('.')[0];
   }
   return +value.replace(/[^0-9\n]/g, '');
 }

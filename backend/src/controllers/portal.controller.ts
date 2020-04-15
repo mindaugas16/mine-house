@@ -7,12 +7,13 @@ export default {
   getSupportedPortalsAsFilters: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const rows = await Portal.findAll({
-        where: {active: true},
+        where: { active: true },
+        order: [['title', 'asc']],
         attributes: {
-          include: [[Sequelize.fn("COUNT", Sequelize.col("realEstates.id")), "realEstatesCount"]]
+          include: [[Sequelize.fn('COUNT', Sequelize.col('realEstates.id')), 'realEstatesCount']],
         },
         include: [{ model: RealEstate, attributes: [] }],
-        group: ['portals.id']
+        group: ['portals.id'],
       });
       res.send(rows);
     } catch (err) {

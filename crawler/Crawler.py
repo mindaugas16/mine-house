@@ -19,17 +19,17 @@ class Crawler:
         self.containers = None
         self.page_soup = None
 
-    def fetch_data(self):
-        self.parse_html(self.create_url(self.price_min, self.price_max))
-        data = self.crawl_data()
-        post_data(data)
-
     def parse_html(self, url):
         u_client = uReq(url)
         page_html = u_client.read()
         u_client.close()
         self.page_soup = soup(page_html, "html.parser")
         self.set_data_containers()
+
+    def fetch_data(self):
+        self.parse_html(self.create_url(self.price_min, self.price_max))
+        data = self.crawl_data()
+        post_data(data)
 
     def create_url(self, price_min, price_max):
         pass

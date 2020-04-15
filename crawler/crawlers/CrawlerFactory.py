@@ -1,3 +1,4 @@
+from crawlers.AlioCrawler import AlioCrawler
 from crawlers.AruodasCrawler import AruodasCrawler
 from crawlers.DomopliusCrawler import DomopliusCrawler
 from crawlers.KampasCrawler import KampasCrawler
@@ -14,3 +15,5 @@ class CrawlerFactory:
             return SkelbiuCrawler()
         elif name == 'kampas':
             return KampasCrawler()
+        elif name == 'alio':
+            return AlioCrawler()

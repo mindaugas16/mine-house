@@ -1,23 +1,32 @@
 <template>
-  <div>
-    <div class="field has-addons">
-      <div class="control">
-        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu" @click="onChangeDirection">
-          <span class="icon is-small">
-            <i class="fa" :class="sort.direction === 'asc' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'" aria-hidden="true"></i>
+  <div class="w-full">
+    <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="sort">
+      Rušiuoti pagal
+    </label>
+    <div class="flex">
+      <div class="relative w-full">
+        <select id="sort" v-model="sort.property" @change="onChangeProperty">
+          <option value="createdAt">Pridėjimo data</option>
+          <option value="updatedAt">Atnaujinimo data</option>
+          <option value="lastSeenAt">Paskutinio peržiūrėjimo data</option>
+          <option value="price">Kaina</option>
+        </select>
+        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+          <span class="icon fill-current h-4 w-4 justify-center flex">
+            <i class="fa fa-angle-down" aria-hidden="true"></i>
           </span>
-        </button>
-      </div>
-      <div class="control">
-        <div class="select">
-          <select v-model="sort.property" @change="onChangeProperty">
-            <option value="createdAt">Pridėjimo data</option>
-            <option value="updatedAt">Atnaujinimo data</option>
-            <option value="lastSeenAt">Paskutinio peržiūrėjimo data</option>
-            <option value="price">Kaina</option>
-          </select>
         </div>
       </div>
+      <button
+        class="px-2 ml-2 text-gray-600 hover:text-gray-800"
+        aria-haspopup="true"
+        aria-controls="dropdown-menu"
+        @click="onChangeDirection"
+      >
+        <span class="icon is-small">
+          <i class="fa" :class="sort.direction === 'asc' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'" aria-hidden="true"></i>
+        </span>
+      </button>
     </div>
   </div>
 </template>
@@ -41,7 +50,7 @@ export default {
       this.sort.direction = direction;
     }
     if (property) {
-      this.sort.direction = property;
+      this.sort.property = property;
     }
   },
   methods: {
@@ -60,7 +69,7 @@ export default {
     onChangeQueryParams(sort) {
       const { direction, property } = sort;
 
-      router.replace({ path: '', query: { ...this.$route.query, direction, property } });
+      router.replace({ path: '', query: { ...this.$route.query, page: undefined, direction, property } });
     },
   },
 };

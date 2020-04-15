@@ -12,7 +12,18 @@ export default {
       commit(LOADING, true);
       try {
         const { data } = await axios.get('http://localhost:3000/api/real-estates', { params });
-        const { data: realEstates, meta: realEstatesMeta } = data;
+        let { data: realEstates, meta: realEstatesMeta } = data;
+        // @TODO: return from BE json instead of json as text
+        realEstates = realEstates.map(realEstate => {
+          return {
+            ...realEstate,
+            lastPriceChanges: realEstate.lastPriceChanges
+              .map(row => JSON.parse(row))
+              .sort((a, b) => {
+                return b.changedAt - a.changedAt;
+              }),
+          };
+        });
         commit(UPDATE_REAL_ESTATES, realEstates);
         commit(UPDATE_REAL_ESTATES_META, realEstatesMeta);
       } catch (err) {

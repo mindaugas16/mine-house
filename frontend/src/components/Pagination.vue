@@ -1,26 +1,28 @@
 <template>
-  <div class="is-flex align-items-center flex-column">
-    <nav class="pagination mb-2 is-small is-centered justify-content-center" role="navigation" aria-label="pagination">
-      <a class="pagination-previous is-hidden-mobile" :disabled="+meta.currentPage === 1" @click="onPrev">
+  <div class="flex flex-col justify-center items-center">
+    <nav class="flex" role="navigation" aria-label="pagination">
+      <button class="order-first btn btn--page mr-3" :disabled="+meta.currentPage === 1" @click="onPrev">
         <span class="icon is-small">
           <i class="fa fa-arrow-left" aria-hidden="true"></i>
         </span>
-      </a>
-      <a class="pagination-next is-hidden-mobile" :disabled="+meta.currentPage === +meta.totalPages" @click="onNext">
+      </button>
+
+      <button class="order-last btn btn--page ml-3" :disabled="+meta.currentPage === +meta.totalPages" @click="onNext">
         <span class="icon is-small">
           <i class="fa fa-arrow-right" aria-hidden="true"></i>
         </span>
-      </a>
-      <ul class="pagination-list flex-grow-0">
+      </button>
+
+      <ul class="order-2 flex-grow-0 flex">
         <li v-for="page in pages" :key="page">
-          <a v-if="!!page" class="pagination-link" :class="{ 'is-current': page === +meta.currentPage }" @click="onChangePage(page)">
+          <button v-if="!!page" class="btn btn--page mx-1" :class="{ selected: page === +meta.currentPage }" @click="onChangePage(page)">
             {{ page }}
-          </a>
-          <span v-else class="pagination-ellipsis">&hellip;</span>
+          </button>
+          <span v-else class="flex items-end h-full">&hellip;</span>
         </li>
       </ul>
     </nav>
-    <small class="is-size-7 has-text-grey"> Iš viso {{ meta.totalCount }} rezultatų </small>
+    <small class="mt-4 text-gray-500"> Iš viso {{ meta.totalCount }} rezultatų </small>
   </div>
 </template>
 
@@ -102,4 +104,15 @@ function generatePagination(meta) {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.btn {
+  &--page {
+    @apply p-0 w-8 h-8 text-sm bg-gray-200;
+
+    &:hover,
+    &.selected {
+      @apply bg-gray-700 text-white;
+    }
+  }
+}
+</style>

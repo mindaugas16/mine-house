@@ -15,7 +15,8 @@ app.use('/api', routes);
 
 sequelize
   // .sync({ force: true })
-  .authenticate()
+  .sync()
+  // .authenticate()
   .then(() => {
     const server = http.createServer(app);
 

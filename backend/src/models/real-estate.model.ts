@@ -9,15 +9,14 @@ export interface RealEstateInterface extends Model {
   price: number;
   area: number;
   buildingStatus: number;
-  priceChange: number;
-  priceChangePercentage: number;
   new: boolean;
   portal: PortalInterface;
   lastSeenAt: number;
   lastPriceChanges: {
-    priceChangeFrom: number;
-    priceChangeTo: number;
+    priceBefore: number;
+    priceAfter: number;
     changedAt: Date;
+    priceChangePercentage: number;
   }[];
   imagePath: string;
   createdAt: Date;
@@ -27,6 +26,7 @@ export interface RealEstateInterface extends Model {
 
 type ModelStatic = typeof Model & {
   new (values?: object, options?: BuildOptions): RealEstateInterface;
+  getDataValue(key: any): any;
 };
 
 const RealEstate = <ModelStatic>sequelize.define(
@@ -54,12 +54,6 @@ const RealEstate = <ModelStatic>sequelize.define(
     buildingStatus: {
       type: DataTypes.STRING,
     },
-    priceChange: {
-      type: DataTypes.INTEGER,
-    },
-    priceChangePercentage: {
-      type: DataTypes.DECIMAL(10, 2),
-    },
     new: {
       type: DataTypes.BOOLEAN,
     },
@@ -77,7 +71,7 @@ const RealEstate = <ModelStatic>sequelize.define(
       type: DataTypes.DATE,
     },
     lastPriceChanges: {
-      type: DataTypes.ARRAY(DataTypes.INTEGER),
+      type: DataTypes.ARRAY(DataTypes.TEXT),
       defaultValue: [],
     },
     imagePath: {
