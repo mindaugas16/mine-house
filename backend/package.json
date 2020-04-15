@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "serve": "nodemon src/app.ts",
     "start": "ts-node -r tsconfig-paths/register src/app.ts",
-    "start:watch": "nodemon src/app.ts"
+    "build": "tsc -b"
   },
   "author": "",
   "license": "ISC",

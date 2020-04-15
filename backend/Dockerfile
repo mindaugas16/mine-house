@@ -6,8 +6,13 @@ COPY package*.json ./
 
 RUN npm install
 
-COPY src .
+COPY . .
+
+RUN npm run build
+
+COPY .env ./dist/
+WORKDIR ./dist
 
 EXPOSE 3000
 
-CMD [ "npm", "start" ]
+CMD node src/app.js
