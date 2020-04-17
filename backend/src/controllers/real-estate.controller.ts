@@ -4,6 +4,7 @@ import Portal from '../models/portal.model';
 import { download } from '../utilities/downloader';
 import crypto from 'crypto-js';
 import { Op, Sequelize } from 'sequelize';
+import { getActivePortals } from './portal.controller';
 
 const SHOW_PER_PAGE = 12;
 
@@ -14,7 +15,11 @@ export default {
       let portalCondition = {};
       let order: any[] = [];
       if (portals) {
+        // @TODO: check if portal is active before filtering
         portalCondition = { name: portals.split(',') };
+      } else {
+        const activePortals = await getActivePortals();
+        portalCondition = { name: activePortals.map(({ name }) => name) };
       }
       if (groupBy) {
         order.push([groupBy, 'desc']);
@@ -63,14 +68,45 @@ export default {
   markAsSeen: async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     try {
-      const [_, rows] = await RealEstate.update({ new: false, lastSeenAt: Date.now() }, { where: { id }, returning: true });
+      const [_, rows] = await RealEstate.update(
+        { new: false, lastSeenAt: Date.now() },
+        {
+          where: { id },
+          returning: true,
+        }
+      );
       const [row] = rows;
       res.send(row);
     } catch (err) {
       res.status(400).json(err);
     }
   },
-  postRealEstates: async (req: Request, res: Response, next: NextFunction) => {
+};
+
+function definePortalByLink(link: string): string {
+  // @TODO: update regex to cover www. and other url cases https://nodejs.org/api/url.html
+  const matches = link.replace('www.', '').match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
+  if (!(matches && matches.length)) {
+    throw new Error('Unable identify portal');
+  }
+  return matches[1];
+}
+
+function convertToNumber(value: string): number {
+  if (value.indexOf('-') > -1) {
+    value = value.split('-')[1];
+  }
+  if (value.indexOf(',') > -1) {
+    value = value.split(',')[0];
+  }
+  if (value.indexOf('.') > -1) {
+    value = value.split('.')[0];
+  }
+  return +value.replace(/[^0-9\n]/g, '');
+}
+
+export async function postRealEstates(realEstates: RealEstateInterface[]) {
+  return new Promise(async (resolve, reject) => {
     async function runUpdate(item: any) {
       return new Promise(async (resolve, reject) => {
         try {
@@ -99,12 +135,13 @@ export default {
           const foundItem = await RealEstate.findOne({ where: { link: item.link } });
           if (!foundItem) {
             if (item.imageUrl) {
+              // @TODO: sometimes generate existing filename
               const filename = crypto.MD5(`${newItem.title}${newItem.createdAt}`);
               const fileExtension = item.imageUrl.split('.').pop();
 
               const imagePath = `images/real-estates/${filename}.${fileExtension}`;
 
-              download(item.imageUrl, imagePath, () => {});
+              await download(item.imageUrl, imagePath);
               newItem.imagePath = imagePath;
             }
             resolve(RealEstate.create(newItem));
@@ -140,41 +177,17 @@ export default {
           const found = await RealEstate.update(body, { where: { link: item.link } });
           resolve(found);
         } catch (err) {
-          res.status(400).json({ err, message: 'something went wrong' });
+          reject({ err, message: 'something went wrong' });
         }
       });
     }
-
-    const realEstates: RealEstateInterface[] = req.body;
-    const promises: Promise<any>[] = [];
-    realEstates.forEach(item => promises.push(runUpdate(item)));
     try {
+      const promises: Promise<any>[] = [];
+      realEstates.forEach(item => promises.push(runUpdate(item)));
       await Promise.all(promises);
-      res.send({ message: 'Data update successfully' });
+      resolve({ message: 'Data update successfully' });
     } catch (err) {
-      res.status(400).json({ err, message: 'something went wrong' });
+      reject(err);
     }
-  },
-};
-
-function definePortalByLink(link: string): string {
-  // @TODO: update regex to cover www. and other url cases https://nodejs.org/api/url.html
-  const matches = link.replace('www.', '').match(/^https?\:\/\/([^\/?#]+)(?:[\/?#]|$)/i);
-  if (!(matches && matches.length)) {
-    throw new Error('Unable identify portal');
-  }
-  return matches[1];
-}
-
-function convertToNumber(value: string): number {
-  if (value.indexOf('-') > -1) {
-    value = value.split('-')[1];
-  }
-  if (value.indexOf(',') > -1) {
-    value = value.split(',')[0];
-  }
-  if (value.indexOf('.') > -1) {
-    value = value.split('.')[0];
-  }
-  return +value.replace(/[^0-9\n]/g, '');
+  });
 }

@@ -1,14 +1,5 @@
 from urllib.request import urlopen as uReq
 from bs4 import BeautifulSoup as soup
-import requests
-
-API_ENDPOINT = "http://localhost:3000/api/real-estates"
-
-
-def post_data(payload):
-    response = requests.post(url=API_ENDPOINT, json=payload)
-    print('payload', payload)
-    print(response.json())
 
 
 class Crawler:
@@ -28,8 +19,7 @@ class Crawler:
 
     def fetch_data(self):
         self.parse_html(self.create_url(self.price_min, self.price_max))
-        data = self.crawl_data()
-        post_data(data)
+        return self.crawl_data()
 
     def create_url(self, price_min, price_max):
         pass

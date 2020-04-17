@@ -8,11 +8,11 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build
-
-COPY .env ./dist/
-WORKDIR ./dist
+#COPY .env ./dist/
+#WORKDIR ./dist
 
 EXPOSE 3000
 
-CMD node src/app.js
+#CMD node src/app.js
+
+CMD ["npm", "start"]

@@ -10,4 +10,7 @@
 .env
 
 # assets
-/src/assets/real-estates
+public/assets/images/real-estates
+
+# build
+dist

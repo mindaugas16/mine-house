@@ -8,7 +8,8 @@ const router = express.Router();
 
 router.use('/real-estates', RealEstateRoutes);
 router.use('/portals', PortalRoutes);
-router.use('/assets/images', express.static(path.join(__dirname, '../assets/images')));
-router.post('/run-crawler', CrawlerController.run);
+router.get('/run-crawler', CrawlerController.run);
+
+router.use('/assets/images', express.static(path.join(__dirname, '../../public/assets/images')));
 
 export default router;

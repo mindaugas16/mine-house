@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import Portal from '../models/portal.model';
+import Portal, { PortalInterface } from '../models/portal.model';
 import RealEstate from '../models/real-estate.model';
 import { Sequelize } from 'sequelize';
 
@@ -29,3 +29,9 @@ export default {
     }
   },
 };
+
+export function getActivePortals(): Promise<PortalInterface[]> {
+  return Portal.findAll({
+    where: { active: true },
+  });
+}
