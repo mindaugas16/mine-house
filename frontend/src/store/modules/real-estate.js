@@ -11,7 +11,7 @@ export default {
     async fetchRealEstates({ commit }, params) {
       commit(LOADING, true);
       try {
-        const { data } = await axios.get('http://localhost:3000/api/real-estates', { params });
+        const { data } = await axios.get(`${process.env.VUE_APP_API_HOST}:3000/api/real-estates`, { params });
         let { data: realEstates, meta: realEstatesMeta } = data;
         // @TODO: return from BE json instead of json as text
         realEstates = realEstates.map(realEstate => {
@@ -33,7 +33,7 @@ export default {
     },
     async markAsSeen({ commit }, id) {
       try {
-        const { data: values } = await axios.patch(`http://localhost:3000/api/real-estates/${id}/mark-as-seen`, {});
+        const { data: values } = await axios.patch(`${process.env.VUE_APP_API_HOST}:3000/api/real-estates/${id}/mark-as-seen`, {});
         commit(UPDATE_REAL_ESTATE, { id, values });
       } catch (err) {
         console.error(err);
@@ -41,7 +41,7 @@ export default {
     },
     async markAsStarred({ commit }, { id, starred }) {
       try {
-        await axios.patch(`http://localhost:3000/api/real-estates/${id}/mark-as-starred`, { starred });
+        await axios.patch(`${process.env.VUE_APP_API_HOST}/api/real-estates/${id}/mark-as-starred`, { starred });
         commit(UPDATE_REAL_ESTATE, { id, values: { starred } });
       } catch (err) {
         console.error(err);

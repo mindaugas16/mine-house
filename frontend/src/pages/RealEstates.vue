@@ -99,7 +99,7 @@ export default {
     onRunCrawler() {
       this.loadingCrawler = true;
       axios
-        .get('http://localhost:3000/api/run-crawler')
+        .get(`${process.env.VUE_APP_API_HOST}:3000/api/run-crawler`)
         .then(() => {
           this.getRealEstates();
           this.loadingCrawler = false;

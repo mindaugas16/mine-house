@@ -8,7 +8,7 @@ RUN npm install
 
 COPY . .
 
-#COPY .env ./dist/
+#COPY dev.env.js ./dist/
 #WORKDIR ./dist
 
 EXPOSE 3000

@@ -9,7 +9,7 @@ import './assets/scss/main.scss';
 moment.locale('lt');
 
 Vue.config.productionTip = false;
-
+console.log(process.env.VUE_APP_API_HOST);
 new Vue({
   router,
   store,

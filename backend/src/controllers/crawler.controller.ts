@@ -13,7 +13,10 @@ export default {
         headers: { 'Content-Type': 'application/json' },
       });
       const realEstates = await response.json();
-      await postRealEstates(realEstates);
+      if (realEstates && realEstates.length) {
+        await postRealEstates(realEstates);
+      }
+      console.log(realEstates);
       res.send({ message: `Crawling done. Total results crawled ${realEstates.length}` });
     } catch (err) {
       console.error(err);

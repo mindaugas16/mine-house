@@ -17,6 +17,8 @@ def run_crawlers():
             return jsonify(err)
         except BaseException:
             return jsonify({"message": "Something went from in crawler"})
+    if not data:
+        return jsonify(data)
     return jsonify(flatten(data))
 
 
