@@ -7,7 +7,7 @@
 /.idea
 
 .DS_Store
-.env
+.env.production
 
 # assets
 public/assets/images/real-estates
