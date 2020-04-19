@@ -8,6 +8,10 @@ services:
     env_file:
       - backend/.env
 
+  frontend:
+    env_file:
+      - frontend/.env
+
   postgres:
     env_file:
       - postgres/.env
