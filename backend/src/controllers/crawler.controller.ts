@@ -7,19 +7,25 @@ export default {
   run: async (req: Request, res: Response, next: NextFunction) => {
     const portals = await Portal.findAll({ attributes: ['name'], where: { active: true } });
     try {
-      const response = await fetch(`http://${process.env.CRAWLER_HOST}:5000/run`, {
-        method: 'POST',
-        body: JSON.stringify({ portals: portals.map(({ name }) => name) }),
-        headers: { 'Content-Type': 'application/json' },
-      });
-      if (response.status >= 400 && response.status < 600) {
-        throw new Error('Something went wrong in crawler');
-      }
-      const realEstates = await response.json();
-      if (realEstates && realEstates.length) {
-        await postRealEstates(realEstates);
-      }
-      res.send({ message: `Crawling done. Total results crawled ${realEstates.length}` });
+      let totalItemsCount = 0;
+      const promises = portals.map(async ({ name }) => {
+        const response = await fetch(`http://${process.env.CRAWLER_HOST}:5000/run`, {
+          method: 'POST',
+          body: JSON.stringify({ portals: [name] }),
+          headers: { 'Content-Type': 'application/json' },
+        });
+        if (response.status >= 400 && response.status < 600) {
+          throw new Error('Something went wrong in crawler');
+        }
+        const realEstates = await response.json();
+        if (realEstates && realEstates.length) {
+          await postRealEstates(realEstates);
+        }
+        totalItemsCount += realEstates.length;
+      })
+      await Promise.all(promises);
+
+      res.send({ message: `Crawling done. Total results crawled ${totalItemsCount}` });
     } catch (err) {
       console.error(err);
       res.status(400).send(err);
