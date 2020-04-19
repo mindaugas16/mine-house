@@ -9,16 +9,24 @@ class AlioCrawler(Crawler):
     def crawl_data(self):
         real_estates = []
         for container in self.containers:
-            image_url = container.img["data-src"]
-            link_container = container.find("div", {"class": "desc_m_a_b"}).find("a", {"class": "vertiselink"})
-            title = link_container.text.strip()
-            link = link_container["href"]
+            try:
+                if container.img:
+                    image_url = container.img["data-src"]
+                else:
+                    image_url = None
 
-            param_data = container.find("div", {"class": "description"}).text.strip().split('|')
-            area = param_data[0].strip()
-            price = container.find("span", {"class": "main_price"}).text.strip()
-            real_estates.append(
-                RealEstate(title, link, price, area, None, image_url).to_json())
+                link_container = container.find("div", {"class": "desc_m_a_b"}).find("a", {"class": "vertiselink"})
+                title = link_container.text.strip()
+                link = link_container["href"]
+
+                param_data = container.find("div", {"class": "description"}).text.strip().split('|')
+                area = param_data[0].strip()
+                price = container.find("span", {"class": "main_price"}).text.strip()
+                real_estates.append(
+                    RealEstate(title, link, price, area, None, image_url).to_json())
+            except BaseException as err:
+                print('Alio crawler', container, err)
+                continue
 
         return real_estates
 

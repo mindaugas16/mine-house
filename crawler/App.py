@@ -14,9 +14,10 @@ def run_crawlers():
             data.append(factory.create_crawler(portal).fetch_data())
         except AttributeError as err:
             print(err)
-            return jsonify(err)
-        except BaseException:
-            return jsonify({"message": "Something went from in crawler"})
+            return jsonify(err), 400
+        except BaseException as err:
+            print(err)
+            return jsonify({"message": "Something went from in crawler"}), 400
     if not data:
         return jsonify(data)
     return jsonify(flatten(data))
@@ -33,4 +34,4 @@ def flatten(input_array):
 
 
 if __name__ == '__main__':
-    app.run('0.0.0.0')
+    app.run('0.0.0.0', debug=True)

@@ -12,15 +12,17 @@ export default {
         body: JSON.stringify({ portals: portals.map(({ name }) => name) }),
         headers: { 'Content-Type': 'application/json' },
       });
+      if (response.status >= 400 && response.status < 600) {
+        throw new Error('Something went wrong in crawler');
+      }
       const realEstates = await response.json();
       if (realEstates && realEstates.length) {
         await postRealEstates(realEstates);
       }
-      console.log(realEstates);
       res.send({ message: `Crawling done. Total results crawled ${realEstates.length}` });
     } catch (err) {
       console.error(err);
-      res.status(400).json(err);
+      res.status(400).send(err);
     }
   },
 };

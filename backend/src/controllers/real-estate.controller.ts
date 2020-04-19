@@ -107,80 +107,6 @@ function convertToNumber(value: string): number {
 
 export async function postRealEstates(realEstates: RealEstateInterface[]) {
   return new Promise(async (resolve, reject) => {
-    async function runUpdate(item: any) {
-      return new Promise(async (resolve, reject) => {
-        try {
-          const portalLink = definePortalByLink(item.link);
-          const portal = await Portal.findOne({ where: { link: { [Op.iLike]: `%${portalLink}%` } } });
-
-          if (!portal) {
-            reject(new Error('Unable to identify portal'));
-            return;
-          }
-
-          const newItem: RealEstateInterface = {
-            ...item,
-            price: convertToNumber(item.price),
-            area: convertToNumber(item.area),
-            priceChangePercentage: item.priceChangePercentage
-              ? +item.priceChangePercentage
-                  .toString()
-                  .replace(',', '.')
-                  .replace(/[^0-9.\n]/g, '')
-              : null,
-            new: true,
-            portalId: portal.id,
-            createdAt: Date.now(),
-          };
-          const foundItem = await RealEstate.findOne({ where: { link: item.link } });
-          if (!foundItem) {
-            if (item.imageUrl) {
-              // @TODO: sometimes generate existing filename
-              const filename = crypto.MD5(`${newItem.title}${newItem.createdAt}`);
-              const fileExtension = item.imageUrl.split('.').pop();
-
-              const imagePath = `images/real-estates/${filename}.${fileExtension}`;
-
-              await download(item.imageUrl, imagePath);
-              newItem.imagePath = imagePath;
-            }
-            resolve(RealEstate.create(newItem));
-            return;
-          }
-          let body = {};
-          if (foundItem.price !== newItem.price) {
-            const priceChangePercentage = +(((foundItem.price - newItem.price) * 100) / foundItem.price).toFixed(2);
-            body = {
-              ...body,
-              price: newItem.price,
-              lastPriceChanges: Sequelize.fn(
-                'array_append',
-                Sequelize.col('lastPriceChanges'),
-                JSON.stringify({
-                  priceBefore: foundItem.price,
-                  priceAfter: newItem.price,
-                  priceChangePercentage,
-                  changedAt: Date.now(),
-                })
-              ),
-            };
-          }
-
-          if (foundItem.area !== newItem.area) {
-            body = { ...body, area: newItem.area };
-          }
-
-          if (!Object.keys(body).length) {
-            return resolve();
-          }
-          body = { ...body, updatedAt: Date.now(), lastSeenAt: null };
-          const found = await RealEstate.update(body, { where: { link: item.link } });
-          resolve(found);
-        } catch (err) {
-          reject({ err, message: 'something went wrong' });
-        }
-      });
-    }
     try {
       const promises: Promise<any>[] = [];
       realEstates.forEach(item => promises.push(runUpdate(item)));
@@ -188,6 +114,82 @@ export async function postRealEstates(realEstates: RealEstateInterface[]) {
       resolve({ message: 'Data update successfully' });
     } catch (err) {
       reject(err);
+    }
+  });
+}
+
+async function runUpdate(item: any) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const portalLink = definePortalByLink(item.link);
+      const portal = await Portal.findOne({ where: { link: { [Op.iLike]: `%${portalLink}%` } } });
+
+      if (!portal) {
+        reject(new Error('Unable to identify portal'));
+        return;
+      }
+
+      const newItem: RealEstateInterface = {
+        ...item,
+        price: convertToNumber(item.price),
+        area: convertToNumber(item.area),
+        priceChangePercentage: item.priceChangePercentage
+          ? +item.priceChangePercentage
+              .toString()
+              .replace(',', '.')
+              .replace(/[^0-9.\n]/g, '')
+          : null,
+        new: true,
+        portalId: portal.id,
+        createdAt: Date.now(),
+      };
+      const foundItem = await RealEstate.findOne({ where: { link: item.link } });
+      if (!foundItem) {
+        if (item.imageUrl) {
+          const filename = crypto.MD5(`${newItem.link}${newItem.price}${newItem.createdAt}`);
+          const fileExtension = item.imageUrl.split('.').pop();
+
+          const imagePath = `images/real-estates/${filename}.${fileExtension}`;
+
+          setTimeout(async () => {
+            await download(item.imageUrl, imagePath);
+          }, 0);
+          newItem.imagePath = imagePath;
+        }
+        resolve(RealEstate.create(newItem));
+        return;
+      }
+      let body = {};
+      if (foundItem.price !== newItem.price) {
+        const priceChangePercentage = +(((foundItem.price - newItem.price) * 100) / foundItem.price).toFixed(2);
+        body = {
+          ...body,
+          price: newItem.price,
+          lastPriceChanges: Sequelize.fn(
+            'array_append',
+            Sequelize.col('lastPriceChanges'),
+            JSON.stringify({
+              priceBefore: foundItem.price,
+              priceAfter: newItem.price,
+              priceChangePercentage,
+              changedAt: Date.now(),
+            })
+          ),
+        };
+      }
+
+      if (foundItem.area !== newItem.area) {
+        body = { ...body, area: newItem.area };
+      }
+
+      if (!Object.keys(body).length) {
+        return resolve();
+      }
+      body = { ...body, updatedAt: Date.now(), lastSeenAt: null };
+      const found = await RealEstate.update(body, { where: { link: item.link } });
+      resolve(found);
+    } catch (err) {
+      reject({ err, message: 'something went wrong' });
     }
   });
 }
