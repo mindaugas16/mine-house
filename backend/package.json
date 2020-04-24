@@ -6,8 +6,6 @@
   "scripts": {
     "serve": "nodemon src/app.ts",
     "start": "ts-node -r tsconfig-paths/register src/app.ts",
-    "build": "tsc -b",
-    "pm2": "pm2 start ../pm2-processes.json --no-daemon",
     "migrate": "ts-node -r tsconfig-paths/register src/database/migrate.ts"
   },
   "author": "",

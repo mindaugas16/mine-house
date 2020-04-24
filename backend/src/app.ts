@@ -20,7 +20,7 @@ sequelize
   .authenticate()
   .then(() => {
     const server = http.createServer(app);
-    server.listen(process.env.BACKEND_PORT || 3000, () => {
+    server.listen(process.env.PORT || 3000, () => {
       console.log('Server is running on port', (server.address() as any).port);
     });
   })

@@ -4,24 +4,6 @@ volumes:
   postgres:
 
 services:
-  backend:
-    build:
-      context: backend/
-    image: mindaugas16/mine-house-backend
-    restart: always
-    environment:
-      TZ: ${TZ}
-      BACKEND_PORT: ${BACKEND_PORT}
-      DB_HOST: ${DB_HOST}
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      CRAWLER_HOST: ${CRAWLER_HOST}
-    depends_on:
-      - postgres
-    ports:
-      - 80:80
-
   postgres:
     image: postgres
     environment:
