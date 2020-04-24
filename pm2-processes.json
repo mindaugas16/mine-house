@@ -1,0 +1,30 @@
+{
+  "apps": [
+    {
+      "name": "api",
+      "cwd": "/Users/mindaugas/Desktop/real-estate-parser/backend",
+      "script": "npm run start",
+      "merge_logs": true,
+      "max_restarts": 10,
+      "instances": 1,
+      "max_memory_restart": "200M",
+      "env": {
+        "PORT": 3000,
+        "NODE_ENV": "production",
+        "DB_HOST": "localhost",
+        "POSTGRES_DB": "realestates",
+        "POSTGRES_USER": "mindaugas",
+        "POSTGRES_PASSWORD": "labasrytas"
+      }
+    },
+    {
+      "name": "crawler",
+      "cwd": "/Users/mindaugas/Desktop/real-estate-parser/crawler",
+      "script": "python3 App.py --interpreter python3",
+      "env": {
+        "PORT": 5000,
+        "NODE_ENV": "production"
+      }
+    }
+  ]
+}

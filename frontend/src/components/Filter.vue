@@ -64,7 +64,7 @@ export default {
   },
   async created() {
     try {
-      const { data } = await axios.get(`${process.env.VUE_APP_API_HOST}:3000/api/portals`);
+      const { data } = await axios.get(`${process.env.VUE_APP_API_HOST}/api/portals`);
       this.portals = data;
     } catch (err) {
       console.error(err);

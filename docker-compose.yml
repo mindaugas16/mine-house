@@ -9,31 +9,26 @@ services:
       context: backend/
     image: mindaugas16/mine-house-backend
     restart: always
+    environment:
+      TZ: ${TZ}
+      BACKEND_PORT: ${BACKEND_PORT}
+      DB_HOST: ${DB_HOST}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      CRAWLER_HOST: ${CRAWLER_HOST}
     depends_on:
       - postgres
     ports:
-      - 3000:3000
-    links:
-      - crawler
+      - 80:80
 
   postgres:
     image: postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - postgres:/var/lib/postgresql/data
     ports:
       - 5432:5432
-
-  frontend:
-    build:
-      context: frontend/
-    image: mindaugas16/mine-house-frontend
-    ports:
-      - 80:80
-
-  crawler:
-    build:
-      context: crawler/
-    image: mindaugas16/mine-house-crawler
-    restart: always
-    expose:
-      - 5000

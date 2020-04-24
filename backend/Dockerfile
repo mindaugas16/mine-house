@@ -8,11 +8,6 @@ RUN npm install
 
 COPY . .
 
-#COPY dev.env.js ./dist/
-#WORKDIR ./dist
+EXPOSE 80
 
-EXPOSE 3000
-
-#CMD node src/app.js
-
-CMD ["npm", "start"]
+CMD [ "npm", "run", "pm2" ]

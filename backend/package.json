@@ -6,7 +6,9 @@
   "scripts": {
     "serve": "nodemon src/app.ts",
     "start": "ts-node -r tsconfig-paths/register src/app.ts",
-    "build": "tsc -b"
+    "build": "tsc -b",
+    "pm2": "pm2 start ../pm2-processes.json --no-daemon",
+    "migrate": "ts-node -r tsconfig-paths/register src/database/migrate.ts"
   },
   "author": "",
   "license": "ISC",
@@ -20,6 +22,7 @@
     "node-fetch": "^2.6.0",
     "pg": "^8.0.2",
     "pg-hstore": "^2.3.3",
+    "pm2": "^4.3.1",
     "python-shell": "^1.0.8",
     "sequelize": "^5.21.6",
     "ts-node": "^8.8.1",
