@@ -3,6 +3,7 @@
     <div class="is-flex justify-content-between flex-column lg:sticky top-20">
       <button
         class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow w-full lg:hidden mb-4"
+        aria-label="Filter"
         @click="filtersVisible = !filtersVisible"
       >
         Filtrai
@@ -13,7 +14,13 @@
           <ListSort class="mb-6"></ListSort>
           <ListFilter></ListFilter>
         </div>
-        <button class="btn btn--primary mt-8" :class="{ 'is-loading': loadingCrawler }" :disabled="loadingCrawler" @click="onRunCrawler">
+        <button
+          class="btn btn--primary mt-8"
+          :class="{ 'is-loading': loadingCrawler }"
+          :disabled="loadingCrawler"
+          @click="onRunCrawler"
+          aria-label="Refresh"
+        >
           Atnaujinti
           <span class="icon ml-2">
             <i class="fa fa-refresh"></i>

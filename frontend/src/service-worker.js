@@ -14,12 +14,12 @@ workbox.routing.registerRoute(
         maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
       }),
     ],
-  }),
+  })
 );
 
 workbox.routing.registerRoute(
   new RegExp('http://84.38.182.239'),
   workbox.strategies.networkFirst({
     cacheName: 'api',
-  }),
+  })
 );

@@ -1,6 +1,8 @@
 <template>
   <div class="relative w-full">
-    <input type="text" placeholder="Skelbimų paieška" />
+    <label>
+      <input type="text" placeholder="Skelbimų paieška" />
+    </label>
     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
       <span class="icon fill-current h-4 w-4 justify-center flex">
         <i class="fa fa-search" aria-hidden="true"></i>

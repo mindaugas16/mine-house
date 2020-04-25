@@ -1,7 +1,7 @@
 <template>
   <div v-click-outside="hide" class="dropdown" :class="{ 'is-active': isOpen }">
     <div class="dropdown-trigger">
-      <button class="button" aria-haspopup="true" aria-controls="dropdown-menu" @click="isOpen = !isOpen">
+      <button class="button" aria-haspopup="true" aria-controls="dropdown-menu" @click="isOpen = !isOpen" aria-label="Dropdown Toggle">
         <slot name="button"></slot>
         <span class="icon is-small">
           <i class="fa fa-angle-down" aria-hidden="true"></i>

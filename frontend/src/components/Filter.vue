@@ -17,13 +17,7 @@
             </span>
           </div>
         </div>
-        <button
-          v-if="groupBy"
-          class="px-2 ml-2 text-gray-600 hover:text-gray-800"
-          aria-haspopup="true"
-          aria-controls="dropdown-menu"
-          @click="onClearGrouping"
-        >
+        <button v-if="groupBy" class="px-2 ml-2 text-gray-600 hover:text-gray-800" aria-label="Close" @click="onClearGrouping">
           <span class="icon is-small">
             <i class="fa fa-close" aria-hidden="true"></i>
           </span>

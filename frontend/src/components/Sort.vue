@@ -17,12 +17,7 @@
           </span>
         </div>
       </div>
-      <button
-        class="px-2 ml-2 text-gray-600 hover:text-gray-800"
-        aria-haspopup="true"
-        aria-controls="dropdown-menu"
-        @click="onChangeDirection"
-      >
+      <button class="px-2 ml-2 text-gray-600 hover:text-gray-800" @click="onChangeDirection" aria-label="Sort Direction">
         <span class="icon is-small">
           <i class="fa" :class="sort.direction === 'asc' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'" aria-hidden="true"></i>
         </span>

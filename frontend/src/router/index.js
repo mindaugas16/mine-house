@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import App from '../App';
-import RealEstates from '../pages/RealEstates';
+const RealEstates = () => import('../pages/RealEstates');
 
 Vue.use(Router);
 

@@ -3,7 +3,12 @@
     <div class="flex sm:flex-col">
       <div class="relative w-1/4 sm:w-full">
         <div class="absolute top-10 left-10 flex align-items-start">
-          <button class="btn btn--favorite" :class="item.starred ? 'text-yellow-500' : 'text-white'" @click="onMarkAsStarred()">
+          <button
+            class="btn btn--favorite"
+            :class="item.starred ? 'text-yellow-500' : 'text-white'"
+            @click="onMarkAsStarred()"
+            aria-label="Favorite"
+          >
             <span class="icon">
               <i class="fa fa-star fa-lg"></i>
             </span>
@@ -31,6 +36,7 @@
                 v-if="item.lastPriceChanges.length"
                 class="badge"
                 :class="item.lastPriceChanges[0].priceChangePercentage > 0 ? 'bg-green-500' : 'bg-red-500'"
+                aria-label="Price Change"
               >
                 {{ item.lastPriceChanges[0].priceChangePercentage | percentage }}
               </button>
