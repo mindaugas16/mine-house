@@ -15,7 +15,7 @@
             </span>
           </div>
         </div>
-        <img v-if="item.imagePath" class="sm:w-full" :src="apiHost + ':3000/api/assets/' + item.imagePath" alt="Image" />
+        <img v-if="item.imagePath" class="sm:w-full" :src="item.imagePath" alt="Image" />
         <img v-else src="@/assets/placeholder.png" alt="Image" />
       </div>
       <div class="flex justify-between flex-1 pl-4 pr-8 py-5 sm:px-4">
@@ -110,7 +110,6 @@ export default {
   data() {
     return {
       isOpenDropdown: false,
-      apiHost: process.env.VUE_APP_API_HOST,
     };
   },
   methods: {

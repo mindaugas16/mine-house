@@ -1,9 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
+import { Op, Sequelize } from 'sequelize';
 import RealEstate, { RealEstateInterface } from '../models/real-estate.model';
 import Portal from '../models/portal.model';
-import { download } from '../utilities/downloader';
-import crypto from 'crypto-js';
-import { Op, Sequelize } from 'sequelize';
 import { getActivePortals } from './portal.controller';
 
 const SHOW_PER_PAGE = 12;
@@ -145,17 +143,7 @@ async function runUpdate(item: any) {
       };
       const foundItem = await RealEstate.findOne({ where: { link: item.link } });
       if (!foundItem) {
-        if (item.imageUrl) {
-          const filename = crypto.MD5(`${newItem.link}${newItem.price}${newItem.createdAt}`);
-          const fileExtension = item.imageUrl.split('.').pop();
-
-          const imagePath = `images/real-estates/${filename}.${fileExtension}`;
-
-          setTimeout(async () => {
-            await download(item.imageUrl, imagePath);
-          }, 0);
-          newItem.imagePath = imagePath;
-        }
+        newItem.imagePath = item.imageUrl || null;
         resolve(RealEstate.create(newItem));
         return;
       }
