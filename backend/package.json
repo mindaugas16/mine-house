@@ -2,7 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.ts",
   "scripts": {
     "serve": "nodemon src/app.ts",
     "start": "ts-node -r tsconfig-paths/register src/app.ts",

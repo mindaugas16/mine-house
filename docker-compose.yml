@@ -5,21 +5,22 @@ volumes:
 
 services:
   backend:
+    build:
+      context: backend/
     image: mindaugas16/mine-house-backend
     restart: always
     depends_on:
       - postgres
     environment:
       - TZ=Europe/Vilnius
+      - PORT=80
       - DB_NAME=realestates
       - DB_USERNAME=mindaugas
       - DB_PASSWORD=labasrytas
       - DB_HOST=postgres
       - CRAWLER_HOST=crawler
     ports:
-      - 3000:80
-    links:
-      - crawler
+      - 80:80
 
   postgres:
     image: postgres

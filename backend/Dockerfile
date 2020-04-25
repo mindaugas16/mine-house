@@ -1,18 +1,23 @@
+# stage 1
+FROM node:12.16.1 as builder
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install
+RUN npm install pm2 -g
+COPY . .
+RUN npm run build
+
+# stage 2
 FROM node:12.16.1
 
 WORKDIR /usr/src/app
-
 COPY package*.json ./
+RUN npm install --production
+RUN npm install pm2 -g
+COPY --from=builder /usr/src/app/dist ./dist
 
-RUN npm install
+WORKDIR ./dist
 
-COPY . .
+EXPOSE 80
+CMD ["pm2-runtime", "src/app.js"]
 
-#COPY dev.env.js ./dist/
-#WORKDIR ./dist
-
-EXPOSE 3000
-
-#CMD node src/app.js
-
-CMD ["npm", "start"]
