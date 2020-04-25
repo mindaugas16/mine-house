@@ -38,6 +38,9 @@ services:
     build:
       context: frontend/
     image: mindaugas16/mine-house-frontend
+    environment:
+      - NODE_ENV=production
+      - BASE_URL=./
     ports:
       - 80:80
 
