@@ -5,6 +5,7 @@ import * as moment from 'moment';
 import router from './router';
 import store from './store/index';
 import './assets/scss/main.scss';
+import './registerServiceWorker';
 
 moment.locale('lt');
 

@@ -5,8 +5,8 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "build:prod": "vue-cli-service build --mode production",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "build:prod": "vue-cli-service build --mode production"
   },
   "dependencies": {
     "autoprefixer": "^9.7.6",
@@ -15,6 +15,7 @@
     "dotenv": "^8.2.0",
     "font-awesome": "^4.7.0",
     "moment": "^2.24.0",
+    "register-service-worker": "^1.7.1",
     "tailwindcss": "^1.2.0",
     "vue": "^2.6.11",
     "vue-router": "^3.1.6",
@@ -24,6 +25,7 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.2.0",
     "@vue/cli-plugin-eslint": "~4.2.0",
+    "@vue/cli-plugin-pwa": "^4.3.1",
     "@vue/cli-service": "~4.2.0",
     "babel-eslint": "^10.1.0",
     "eslint": "^6.8.0",

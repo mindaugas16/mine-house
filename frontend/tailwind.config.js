@@ -16,8 +16,8 @@ module.exports = {
         '20': '20px',
       },
       gridTemplateColumns: {
-        'main': '250px 1fr',
-      }
-    }
+        main: '250px 1fr',
+      },
+    },
   },
 };
