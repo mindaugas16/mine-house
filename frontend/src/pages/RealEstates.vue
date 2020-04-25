@@ -18,8 +18,8 @@
           class="btn btn--primary mt-8"
           :class="{ 'is-loading': loadingCrawler }"
           :disabled="loadingCrawler"
-          @click="onRunCrawler"
           aria-label="Refresh"
+          @click="onRunCrawler"
         >
           Atnaujinti
           <span class="icon ml-2">

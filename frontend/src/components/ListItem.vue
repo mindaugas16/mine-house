@@ -6,8 +6,8 @@
           <button
             class="btn btn--favorite"
             :class="item.starred ? 'text-yellow-500' : 'text-white'"
-            @click="onMarkAsStarred()"
             aria-label="Favorite"
+            @click="onMarkAsStarred()"
           >
             <span class="icon">
               <i class="fa fa-star fa-lg"></i>

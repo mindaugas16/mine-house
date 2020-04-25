@@ -1,13 +1,13 @@
 <template>
   <div class="flex flex-col justify-center items-center">
     <nav class="flex" role="navigation" aria-label="pagination">
-      <button class="order-first btn btn--page mr-3" :disabled="+meta.currentPage === 1" @click="onPrev" aria-label="Prev">
+      <button class="order-first btn btn--page mr-3" :disabled="+meta.currentPage === 1" aria-label="Prev" @click="onPrev">
         <span class="icon is-small">
           <i class="fa fa-arrow-left" aria-hidden="true"></i>
         </span>
       </button>
 
-      <button class="order-last btn btn--page ml-3" :disabled="+meta.currentPage === +meta.totalPages" @click="onNext" aria-label="Next">
+      <button class="order-last btn btn--page ml-3" :disabled="+meta.currentPage === +meta.totalPages" aria-label="Next" @click="onNext">
         <span class="icon is-small">
           <i class="fa fa-arrow-right" aria-hidden="true"></i>
         </span>
@@ -19,8 +19,8 @@
             v-if="!!page"
             class="btn btn--page mx-1"
             :class="{ selected: page === +meta.currentPage }"
-            @click="onChangePage(page)"
             aria-label="Page"
+            @click="onChangePage(page)"
           >
             {{ page }}
           </button>
