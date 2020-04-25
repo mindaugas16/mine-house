@@ -13,14 +13,14 @@ services:
       - postgres
     environment:
       - TZ=Europe/Vilnius
-      - PORT=80
+      - PORT=3000
       - DB_NAME=realestates
       - DB_USERNAME=mindaugas
       - DB_PASSWORD=labasrytas
       - DB_HOST=postgres
       - CRAWLER_HOST=crawler
     ports:
-      - 80:80
+      - 3000:3000
 
   postgres:
     image: postgres
@@ -32,3 +32,10 @@ services:
       - postgres:/var/lib/postgresql/data
     ports:
       - 5432:5432
+
+  frontend:
+    build:
+      context: frontend/
+    image: mindaugas16/mine-house-frontend
+    ports:
+      - 80:80

@@ -18,6 +18,6 @@ COPY --from=builder /usr/src/app/dist ./dist
 
 WORKDIR ./dist
 
-EXPOSE 80
+EXPOSE 3000
 CMD ["pm2-runtime", "src/app.js"]
 
