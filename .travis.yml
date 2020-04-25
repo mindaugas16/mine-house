@@ -1,0 +1,13 @@
+language: node_js
+node_js:
+  - "12"
+sudo: required
+services:
+  - docker
+before_script:
+  - npm install
+script:
+  - docker-compose build --pull
+after_success:
+  - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+  - docker-compose push
