@@ -1,6 +1,6 @@
 import Portal, { PortalInterface } from './portal.model';
 
-import sequelize from '../utilities/db';
+import sequelize from '../database';
 import { BuildOptions, DataTypes, Model } from 'sequelize';
 
 export interface RealEstateInterface extends Model {

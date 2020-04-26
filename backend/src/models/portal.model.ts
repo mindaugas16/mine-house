@@ -1,5 +1,5 @@
 import { BuildOptions, DataTypes, Model } from 'sequelize';
-import sequelize from '../utilities/db';
+import sequelize from '../database';
 import RealEstate from './real-estate.model';
 
 export interface PortalInterface extends Model {
