@@ -27,9 +27,14 @@
         <div class="flex flex-col justify-between w-full">
           <div class="flex justify-between sm:mb-4">
             <div class="flex-grow">
-              <a :href="item.link" target="_blank" rel="noreferrer" class="text-xl hover:underline" @click="onMarkAsSeen()">
-                {{ item.title }}
-              </a>
+              <a
+                :href="item.link"
+                target="_blank"
+                rel="noreferrer"
+                class="text-xl hover:underline"
+                @click="onMarkAsSeen()"
+                v-html="$options.filters.highlight(item.title, $route.query.term)"
+              ></a>
             </div>
             <div class="ml-4 flex items-start justify-end flex-shrink-0">
               <button

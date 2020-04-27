@@ -36,19 +36,10 @@
 
 <script>
 import router from '../router';
-import axios from 'axios';
+import ApiService from '../services/api.service';
 
 export default {
   name: 'ListFilter',
-  filters: {
-    join(values, limit) {
-      const items = [...values];
-      if (items.length > limit) {
-        return items.splice(0, limit).join(', ').concat('...');
-      }
-      return items.join(', ');
-    },
-  },
   data() {
     return {
       portals: [],
@@ -58,7 +49,7 @@ export default {
   },
   async created() {
     try {
-      const { data } = await axios.get(`${process.env.VUE_APP_API_HOST}/api/portals`);
+      const { data } = await ApiService.get(`/portals`);
       this.portals = data;
     } catch (err) {
       console.error(err);
