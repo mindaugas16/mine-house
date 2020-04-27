@@ -8,12 +8,27 @@
     "test": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "build:prod": "vue-cli-service build --mode production",
-    "prettier": "prettier --write ."
+    "prettier": "prettier --write ./src && eslint --fix ./src"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "**/*.{js,vue}": [
+      "eslint --fix ./src",
+      "prettier --write ./src"
+    ],
+    "**/*.{json,css,scss}": [
+      "prettier --write ./src"
+    ]
   },
   "dependencies": {
     "autoprefixer": "^9.7.6",
     "axios": "^0.19.2",
     "core-js": "^3.6.4",
+    "debounce": "^1.2.0",
     "dotenv": "^8.2.0",
     "font-awesome": "^4.7.0",
     "moment": "^2.24.0",
@@ -38,6 +53,8 @@
     "eslint-loader": "^4.0.0",
     "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-vue": "^6.2.2",
+    "husky": "^4.2.5",
+    "lint-staged": "^10.1.7",
     "node-sass": "^4.13.1",
     "prettier": "^2.0.2",
     "sass-loader": "^8.0.2",

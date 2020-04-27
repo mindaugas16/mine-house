@@ -1,5 +1,5 @@
 import { shallowMount } from '@vue/test-utils';
-import ListItem from '@/components/ListItem.vue';
+import ListItem from '../../src/components/ListItem.vue';
 
 describe('ListItem.vue', () => {
   it('renders props.item when passed', () => {
@@ -35,4 +35,3 @@ describe('ListItem.vue', () => {
     expect(wrapper.text()).toMatch(item.title);
   });
 });
-

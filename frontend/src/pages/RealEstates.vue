@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto my-10 sm:my-6 lg:grid grid-flow-col grid-cols-main gap-4">
-    <div class="is-flex justify-content-between flex-column lg:sticky top-20">
+    <div class="flex justify-content-between flex-column lg:sticky top-20">
       <button
         class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow w-full lg:hidden mb-4"
         aria-label="Filter"
@@ -21,11 +21,18 @@
           aria-label="Refresh"
           @click="onRunCrawler"
         >
-          Atnaujinti
-          <span class="icon ml-2">
-            <i class="fa fa-refresh"></i>
-          </span>
+          <span>Atnaujinti</span>
+          <div class="ml-2 inline-block">
+            <div :class="{ spinning: loadingCrawler }">
+              <span class="icon">
+                <i class="fa fa-refresh"></i>
+              </span>
+            </div>
+          </div>
         </button>
+        <div class="flex justify-center mt-2">
+          <button class="btn text-xs text-gray-500" aria-label="Clear Filters" @click="onClearFilters">Išvalyti filtrus</button>
+        </div>
       </div>
     </div>
     <div>
@@ -35,7 +42,7 @@
           <h1 v-if="group[0]" class="text-3xl mb-4 font-semibold">{{ group[0] }}</h1>
           <List :real-estates="group[1]"></List>
         </div>
-        <div v-else class="is-flex justify-content-center">
+        <div v-else class="flex justify-center">
           <p><strong>Nieko nerasta</strong></p>
         </div>
       </div>
@@ -56,6 +63,7 @@ import Loader from '../components/ui/Loader';
 import { mapActions, mapGetters } from 'vuex';
 import Search from '../components/Search';
 import moment from 'moment';
+import router from '../router';
 
 export default {
   name: 'RealEstates',
@@ -77,6 +85,9 @@ export default {
     ...mapGetters(['realEstates', 'realEstatesMeta', 'loading']),
     groupedRealEstates() {
       const groupByKey = this.$route.query.groupBy;
+      if (!(this.realEstates && this.realEstates.length)) {
+        return [];
+      }
       if (!groupByKey) {
         return [[null, this.realEstates]];
       }
@@ -99,8 +110,8 @@ export default {
   methods: {
     ...mapActions(['fetchRealEstates']),
     getRealEstates(route = this.$route) {
-      const { direction, page, property, portals, groupBy } = route.query;
-      const queryParams = { direction, page, property, portals, groupBy };
+      const { direction, page, property, portals, groupBy, term } = route.query;
+      const queryParams = { direction, page, property, portals, groupBy, term };
       this.fetchRealEstates(queryParams);
     },
     onRunCrawler() {
@@ -115,6 +126,9 @@ export default {
           this.loadingCrawler = false;
           console.error(err);
         });
+    },
+    onClearFilters() {
+      router.replace({ path: '', params: undefined }).catch(() => {});
     },
   },
 };

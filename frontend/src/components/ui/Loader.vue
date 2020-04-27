@@ -19,6 +19,7 @@ export default {
   .loader {
     height: 50px;
     width: 50px;
+    background: url('../../assets/loader.svg') no-repeat center;
   }
 
   &.is-active {

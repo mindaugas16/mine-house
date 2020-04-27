@@ -5,12 +5,14 @@ import Portal from '../models/portal.model';
 import { getActivePortals } from './portal.controller';
 
 const SHOW_PER_PAGE = 12;
+const SUGGESTIONS_LIMIT = 7;
 
 export default {
   getRealEstates: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { page, property, direction, portals, groupBy } = req.query;
+      const { page, property, direction, portals, groupBy, term } = req.query;
       let portalCondition = {};
+      let condition = {};
       let order: any[] = [];
       if (portals) {
         // @TODO: check if portal is active before filtering
@@ -22,10 +24,14 @@ export default {
       if (groupBy) {
         order.push([groupBy, 'desc']);
       }
+      if (term) {
+        condition = { title: { [Op.iLike]: `%${term}%` } };
+      }
       order.push([[property || 'updatedAt', direction || 'desc']]);
       const currentPage = page || 1;
       const { rows, count } = await RealEstate.findAndCountAll({
         order,
+        where: condition,
         limit: SHOW_PER_PAGE,
         offset: (currentPage - 1) * SHOW_PER_PAGE,
         include: [
@@ -79,7 +85,40 @@ export default {
       res.status(400).json(err);
     }
   },
+  autocomplete: async (req: Request, res: Response, next: NextFunction) => {
+    const { term } = req.query;
+    try {
+      const suggestions = await RealEstate.findAll({
+        where: { title: { [Op.iLike]: `%${term}%` } },
+        attributes: ['title'],
+        limit: SUGGESTIONS_LIMIT,
+      });
+      res.send([...new Set(suggestions.map(({ title }) => title))]);
+    } catch (err) {
+      res.status(400).json(err);
+    }
+  },
 };
+
+// @TODO: get matched words
+// const matchedTitles = await RealEstate.findAll({
+//   where: { title: { [Op.iLike]: `%${term}%` } },
+//   attributes: ['title'],
+//   limit: SUGGESTIONS_LIMIT,
+// });
+// const regex = new RegExp('\\b(\\w*' + term + '\\w*)(ą|č|ę|ė|į|š|ų|ū|ž)\\b', 'ig');
+// const suggestions = [...new Set(matchedTitles)].reduce((acc: string[], item: { title: string }) => {
+//   console.log(item.title);
+//   console.log(item.title.match(regex));
+//   const matches: any = item.title.match(regex);
+//   if (!(matches && matches.length)) {
+//     return acc;
+//   }
+//   acc.push(...matches);
+//   return acc;
+// }, []);
+// console.log(suggestions);
+// res.send([...new Set(suggestions)]);
 
 function definePortalByLink(link: string): string {
   // @TODO: update regex to cover www. and other url cases https://nodejs.org/api/url.html
