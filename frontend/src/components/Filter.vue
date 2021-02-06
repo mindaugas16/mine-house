@@ -17,7 +17,12 @@
             </span>
           </div>
         </div>
-        <button v-if="groupBy" class="px-2 ml-2 text-gray-600 hover:text-gray-800" aria-label="Close" @click="onClearGrouping">
+        <button
+          v-if="groupBy"
+          class="px-2 ml-2 text-gray-600 hover:text-gray-800"
+          aria-label="Close"
+          @click="onClearGrouping"
+        >
           <span class="icon is-small">
             <i class="fa fa-close" aria-hidden="true"></i>
           </span>
@@ -26,7 +31,12 @@
     </div>
     <div class="flex flex-col">
       <p class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Portalai</p>
-      <label v-for="portal in portals" :key="portal.id" class="text-gray-500 hover:text-gray-700 cursor-pointer" :for="portal.id">
+      <label
+        v-for="portal in portals"
+        :key="portal.id"
+        class="text-gray-500 hover:text-gray-700 cursor-pointer"
+        :for="portal.id"
+      >
         <input :id="portal.id" v-model="selectedPortals" type="checkbox" :value="portal.name" @change="onChange" />
         <span class="text-sm ml-2">{{ portal.title }} ({{ portal.realEstatesCount }})</span>
       </label>

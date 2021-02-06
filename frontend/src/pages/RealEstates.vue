@@ -31,14 +31,20 @@
           </div>
         </button>
         <div class="flex justify-center mt-2">
-          <button class="btn text-xs text-gray-500" aria-label="Clear Filters" @click="onClearFilters">Išvalyti filtrus</button>
+          <button class="btn text-xs text-gray-500" aria-label="Clear Filters" @click="onClearFilters">
+            Išvalyti filtrus
+          </button>
         </div>
       </div>
     </div>
     <div>
       <div class="section">
         <Loader v-if="loading"></Loader>
-        <div v-for="group in groupedRealEstates" v-else-if="groupedRealEstates && groupedRealEstates.length" :key="group[0]">
+        <div
+          v-for="group in groupedRealEstates"
+          v-else-if="groupedRealEstates && groupedRealEstates.length"
+          :key="group[0]"
+        >
           <h1 v-if="group[0]" class="text-3xl mb-4 font-semibold">{{ group[0] }}</h1>
           <List :real-estates="group[1]"></List>
         </div>
@@ -47,7 +53,10 @@
         </div>
       </div>
       <div class="section">
-        <Pagination v-if="realEstatesMeta && !loading && realEstates && realEstates.length" :meta="realEstatesMeta"></Pagination>
+        <Pagination
+          v-if="realEstatesMeta && !loading && realEstates && realEstates.length"
+          :meta="realEstatesMeta"
+        ></Pagination>
       </div>
     </div>
   </div>

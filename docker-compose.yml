@@ -1,9 +1,20 @@
-version: "3"
+version: "3.7"
 
 volumes:
   postgres:
 
 services:
+  postgres:
+    image: postgres
+    environment:
+        POSTGRES_DB: ${POSTGRES_DB_NAME}
+        POSTGRES_USER: ${POSTGRES_DB_USERNAME}
+        POSTGRES_PASSWORD: ${POSTGRES_DB_PASSWORD}
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    ports:
+      - ${POSTGRES_DB_PORT}:${POSTGRES_DB_PORT}
+
   backend:
     build:
       context: backend/
@@ -11,42 +22,34 @@ services:
     depends_on:
       - postgres
     environment:
-      - TZ=Europe/Vilnius
-      - PORT=3000
-      - DB_NAME=realestates
-      - DB_USERNAME=mindaugas
-      - DB_PASSWORD=labasrytas
-      - DB_HOST=postgres
-      - CRAWLER_HOST=crawler
+        TZ: ${TZ}
+        APP_SERVER_PORT: ${APP_SERVER_PORT}
+        POSTGRES_DB_NAME: ${POSTGRES_DB_NAME}
+        POSTGRES_DB_USERNAME: ${POSTGRES_DB_USERNAME}
+        POSTGRES_DB_PASSWORD: ${POSTGRES_DB_PASSWORD}
+        POSTGRES_DB_HOST: ${POSTGRES_DB_HOST}
+        CRAWLER_HOST: ${CRAWLER_HOST}
+        CRAWLER_PORT: ${CRAWLER_PORT}
     ports:
       - 3000:3000
     links:
       - crawler
 
-  postgres:
-    image: postgres
-    environment:
-      - POSTGRES_DB=realestates
-      - POSTGRES_USER=mindaugas
-      - POSTGRES_PASSWORD=labasrytas
-    volumes:
-      - postgres:/var/lib/postgresql/data
-    ports:
-      - 5432:5432
-
   frontend:
     build:
       context: frontend/
     image: mindaugas16/mine-house-frontend
-    environment:
-      - NODE_ENV=production
-      - BASE_URL=./
+    links:
+      - backend
     ports:
-      - 80:80
+      - ${VUE_APP_PORT}:${VUE_APP_PORT}
+    expose:
+      - ${VUE_APP_PORT}
+
 
   crawler:
     build:
       context: crawler/
     image: mindaugas16/mine-house-crawler
     expose:
-      - 5000
+      - ${CRAWLER_PORT}

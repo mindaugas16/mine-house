@@ -1,0 +1,23 @@
+{
+  "development": {
+    "username": "mindaugas",
+    "password": "labasrytas",
+    "database": "realestates",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "test": {
+    "username": "mindaugas",
+    "password": "labasrytas",
+    "database": "realestates",
+    "host": "127.0.0.1",
+    "dialect": "postgres"
+  },
+  "production": {
+    "username": "mindaugas",
+    "password": "labasrytas",
+    "database": "realestates",
+    "host": "localhost",
+    "dialect": "postgres"
+  }
+}

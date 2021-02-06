@@ -3,12 +3,16 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// @ts-ignore
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USERNAME, process.env.DB_PASSWORD, {
-  dialect: 'postgres',
-  host: process.env.DB_HOST,
-  logging: false,
-  dialectOptions: { decimalNumbers: true },
-});
+const sequelize = new Sequelize(
+  process.env.POSTGRES_DB_NAME as string,
+  process.env.POSTGRES_DB_USERNAME as string,
+  process.env.POSTGRES_DB_PASSWORD as string,
+  {
+    dialect: 'postgres',
+    host: process.env.POSTGRES_DB_HOST,
+    logging: false,
+    dialectOptions: { decimalNumbers: true },
+  }
+);
 
 export default sequelize;

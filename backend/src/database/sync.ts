@@ -1,7 +1,9 @@
 import sequelize from '@/database/index';
+require('../models/portal.model');
+require('../models/real-estate.model');
 
 sequelize
-  .sync()
+  .sync({ force: true })
   .then(() => {
     console.info('Migration done');
   })

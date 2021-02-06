@@ -17,9 +17,17 @@
           </span>
         </div>
       </div>
-      <button class="px-2 ml-2 text-gray-600 hover:text-gray-800" aria-label="Sort Direction" @click="onChangeDirection">
+      <button
+        class="px-2 ml-2 text-gray-600 hover:text-gray-800"
+        aria-label="Sort Direction"
+        @click="onChangeDirection"
+      >
         <span class="icon is-small">
-          <i class="fa" :class="sort.direction === 'asc' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'" aria-hidden="true"></i>
+          <i
+            class="fa"
+            :class="sort.direction === 'asc' ? 'fa-sort-amount-asc' : 'fa-sort-amount-desc'"
+            aria-hidden="true"
+          ></i>
         </span>
       </button>
     </div>

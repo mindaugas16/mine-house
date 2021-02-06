@@ -9,7 +9,7 @@ export default {
     try {
       let totalItemsCount = 0;
       const promises = portals.map(async ({ name }) => {
-        const response = await fetch(`http://${process.env.CRAWLER_HOST}:5000/run`, {
+        const response = await fetch(`http://${process.env.CRAWLER_HOST}:${process.env.CRAWLER_PORT}/run`, {
           method: 'POST',
           body: JSON.stringify({ portals: [name] }),
           headers: { 'Content-Type': 'application/json' },
@@ -22,7 +22,7 @@ export default {
           await postRealEstates(realEstates);
         }
         totalItemsCount += realEstates.length;
-      })
+      });
       await Promise.all(promises);
 
       res.send({ message: `Crawling done. Total results crawled ${totalItemsCount}` });

@@ -10,7 +10,6 @@ import './registerServiceWorker';
 import ApiService from './services/api.service';
 
 moment.locale('lt');
-
 Vue.config.productionTip = false;
 
 Vue.use(filters);

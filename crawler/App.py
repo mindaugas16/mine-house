@@ -17,7 +17,7 @@ def run_crawlers():
             return jsonify(err), 400
         except BaseException as err:
             print(err)
-            return jsonify({"message": "Something went from in crawler"}), 400
+            return jsonify({"message": "Something went wrong in crawler"}), 400
     if not data:
         return jsonify(data)
     return jsonify(flatten(data))
