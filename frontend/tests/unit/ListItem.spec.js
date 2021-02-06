@@ -1,12 +1,14 @@
-import { shallowMount } from '@vue/test-utils';
+import { createLocalVue, mount } from '@vue/test-utils';
 import ListItem from '../../src/components/ListItem.vue';
+import filters from '@/filters';
 
 describe('ListItem.vue', () => {
-  it('renders props.item when passed', () => {
+  test('is a Vue instance', () => {
     const item = {
       id: 30,
       title: 'Pavilnys, Valdemaro Čarneckio g., mūrinis sublokuotas namas',
-      link: 'https://www.aruodas.lt/namai-vilniuje-pavilnyje-valdemaro-carneckio-g-pavilnyje-v-carneckio-g-parduodamas-vieno-2-1262909/',
+      link:
+        'https://www.aruodas.lt/namai-vilniuje-pavilnyje-valdemaro-carneckio-g-pavilnyje-v-carneckio-g-parduodamas-vieno-2-1262909/',
       price: 109000,
       area: 98,
       buildingStatus: 'Dalinė apdaila',
@@ -29,9 +31,18 @@ describe('ListItem.vue', () => {
         updatedAt: '2020-04-12T21:46:14.952Z',
       },
     };
-    const wrapper = shallowMount(ListItem, {
+    const localVue = createLocalVue();
+    localVue.use(filters);
+    const wrapper = mount(ListItem, {
+      localVue,
       propsData: { item },
+      mocks: {
+        $route: {
+          query: 'test',
+        },
+        highlight: () => {},
+      },
     });
-    expect(wrapper.text()).toMatch(item.title);
+    expect(wrapper.isVueInstance()).toBeTruthy();
   });
 });
