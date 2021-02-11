@@ -1,4 +1,4 @@
-version: "3.7"
+version: "3"
 
 volumes:
   postgres:
@@ -39,6 +39,8 @@ services:
     build:
       context: frontend/
     image: mindaugas16/mine-house-frontend
+    environment:
+      VUE_APP_API_HOST: ${VUE_APP_API_HOST}
     links:
       - backend
     ports:

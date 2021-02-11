@@ -9,9 +9,6 @@ services:
   - docker
 cache: npm
 
-script:
-  - bash test-frontend.sh
-
 deploy:
   provider: script
   script: bash deploy.sh

@@ -30,7 +30,7 @@
           @mouseenter="focusedSuggestionIndex = index"
           @mouseleave="focusedSuggestionIndex = -1"
           @click="onSelect(index)"
-          v-html="$options.filters.highlight(item, value)"
+          v-html="item"
         ></li>
       </ul>
     </div>

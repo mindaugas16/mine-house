@@ -33,7 +33,7 @@
                 rel="noreferrer"
                 class="text-xl hover:underline"
                 @click="onMarkAsSeen()"
-                v-html="item.title | highlight($route.query.term)"
+                v-html="item.title"
               ></a>
             </div>
             <div class="ml-4 flex items-start justify-end flex-shrink-0">
