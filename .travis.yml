@@ -1,16 +1,14 @@
-language: node_js
-node_js:
-  - 12.16.1
-sudo: required
 branches:
   only:
     - master
+
 services:
   - docker
-cache: npm
 
-deploy:
-  provider: script
-  script: bash deploy.sh
-  on:
-    branch: master
+before_install:
+  - curl -L https://github.com/docker/compose/releases/download/1.18.0/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
+
+script:
+  - docker-compose build
