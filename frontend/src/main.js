@@ -18,8 +18,7 @@ moment.locale('lt');
 Vue.config.productionTip = false;
 
 Vue.use(filters);
-
-ApiService.init(`${process.env.VUE_APP_API_HOST}:${process.env.APP_SERVER_PORT}/api`);
+ApiService.init(`${process.env.VUE_APP_API_HOST}/api`);
 new Vue({
   router,
   store,

@@ -38,10 +38,9 @@ services:
   frontend:
     build:
       context: frontend/
+      args:
+        - API_HOST=${API_HOST}:${APP_SERVER_PORT}
     image: mindaugas16/mine-house-frontend
-    environment:
-      VUE_APP_API_HOST: ${VUE_APP_API_HOST}
-      APP_SERVER_PORT: ${APP_SERVER_PORT}
     links:
       - backend
     ports:

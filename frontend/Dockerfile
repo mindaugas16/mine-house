@@ -4,6 +4,8 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
+ARG API_HOST
+ENV API_HOST=$API_HOST
 RUN npm run build:prod
 
 # production stage
