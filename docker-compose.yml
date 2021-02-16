@@ -32,8 +32,8 @@ services:
         CRAWLER_PORT: ${CRAWLER_PORT}
     ports:
       - 3000:3000
-    links:
-      - crawler
+#    links:
+#      - crawler
 
   frontend:
     build:
@@ -48,10 +48,9 @@ services:
     expose:
       - ${VUE_APP_PORT}
 
-
-  crawler:
-    build:
-      context: crawler/
-    image: mindaugas16/mine-house-crawler
-    expose:
-      - ${CRAWLER_PORT}
+#  crawler:
+#    build:
+#      context: crawler/
+#    image: mindaugas16/mine-house-crawler
+#    expose:
+#      - ${CRAWLER_PORT}

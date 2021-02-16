@@ -1,5 +1,5 @@
 module.exports = {
-  purge: ['./src/**/*.html', './src/**/*.vue', './src/**/*.jsx'],
+  purge: ['./src/**/*.vue'],
   theme: {
     screens: {
       xs: { max: '639px' },

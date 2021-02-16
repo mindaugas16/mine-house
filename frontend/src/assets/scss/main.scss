@@ -101,8 +101,8 @@ input[type='number'] {
 }
 
 .modal {
-  display: flex !important;
   @apply justify-center items-center fixed z-10 inset-0 overflow-y-auto min-h-screen pt-4 px-4 pb-20 inset-0 bg-gray-300 bg-opacity-50;
+  display: flex !important;
 
   &-title {
     @apply text-lg leading-6 font-medium text-gray-900;
