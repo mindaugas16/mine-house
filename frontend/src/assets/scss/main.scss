@@ -1,25 +1,29 @@
 @charset "utf-8";
 
-@import '~tailwindcss/base';
-@import '~tailwindcss/components';
-@import '~tailwindcss/utilities';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @import '~font-awesome/css/font-awesome.min.css';
 
 .btn {
   @apply py-2 px-4 rounded bg-transparent;
 
+  & + & {
+    @apply ml-2;
+  }
+
   &:disabled {
     @apply opacity-50 cursor-not-allowed;
     pointer-events: none;
   }
 
-  &--primary {
-    @apply bg-blue-500 text-white;
+  &--default {
+    @apply rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
+  }
 
-    &:hover {
-      @apply bg-blue-700;
-    }
+  &--primary {
+    @apply bg-blue-500 text-white hover:bg-blue-700;
   }
 }
 
@@ -27,7 +31,8 @@ select {
   @apply block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight cursor-pointer;
 }
 
-input[type='text'] {
+input[type='text'],
+input[type='number'] {
   @apply appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight;
   &:focus {
     @apply outline-none bg-white border-gray-500;
@@ -93,4 +98,37 @@ input[type='text'] {
   to {
     transform: rotate(360deg);
   }
+}
+
+.modal {
+  display: flex !important;
+  @apply justify-center items-center fixed z-10 inset-0 overflow-y-auto min-h-screen pt-4 px-4 pb-20 inset-0 bg-gray-300 bg-opacity-50;
+
+  &-title {
+    @apply text-lg leading-6 font-medium text-gray-900;
+  }
+
+  &-content {
+    outline: none;
+  }
+
+  &-dialog {
+    @apply inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform w-full align-middle max-w-lg;
+  }
+
+  &-header {
+    @apply px-4 py-3 sm:px-6 sm:flex-row-reverse flex justify-between;
+  }
+
+  &-body {
+    @apply bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4;
+  }
+
+  &-footer {
+    @apply bg-gray-50 px-4 py-3 flex justify-end;
+  }
+}
+
+.popover {
+  @apply bg-white rounded-lg shadow-xl px-4 py-3;
 }

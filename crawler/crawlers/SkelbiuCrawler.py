@@ -27,5 +27,5 @@ class SkelbiuCrawler(Crawler):
 
         return real_estates
 
-    def create_url(self, price_min, price_max):
+    def create_url(self, price_min, price_max, real_estate_type):
         return f"https://www.skelbiu.lt/skelbimai/?autocompleted=1&keywords=&cost_min={price_min}&cost_max={price_max}&space_min=&space_max=&rooms_min=&rooms_max=&building_type=0&year_min=&year_max=&status=0&building=0&district=0&quarter=0&streets=0&ignorestreets=0&cities=465&distance=0&mainCity=1&search=1&category_id=42&type=0&user_type=0&ad_since_min=0&ad_since_max=0&visited_page=1&orderBy=-1&detailsSearch=1"

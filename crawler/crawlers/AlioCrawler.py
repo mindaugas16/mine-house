@@ -30,5 +30,5 @@ class AlioCrawler(Crawler):
 
         return real_estates
 
-    def create_url(self, price_min, price_max):
+    def create_url(self, price_min, price_max, real_estate_type):
         return f"https://www.alio.lt/paieska/?category_id=1433&city_id=228626&search_block=1&search%5Beq%5D%5Badresas_1%5D=228626&search%5Bgte%5D%5Bkaina_1%5D={price_min}&search%5Blte%5D%5Bkaina_1%5D={price_max}&order=ad_id"

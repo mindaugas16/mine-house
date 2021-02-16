@@ -6,14 +6,14 @@ from crawlers.SkelbiuCrawler import SkelbiuCrawler
 
 
 class CrawlerFactory:
-    def create_crawler(self, name):
+    def create_crawler(self, name, options):
         if name == 'aruodas':
-            return AruodasCrawler()
+            return AruodasCrawler(options)
         elif name == 'domoplius':
-            return DomopliusCrawler()
+            return DomopliusCrawler(options)
         elif name == 'skelbiu':
-            return SkelbiuCrawler()
+            return SkelbiuCrawler(options)
         elif name == 'kampas':
-            return KampasCrawler()
+            return KampasCrawler(options)
         elif name == 'alio':
-            return AlioCrawler()
+            return AlioCrawler(options)

@@ -1,7 +1,18 @@
 import Portal, { PortalInterface } from './portal.model';
+import Crawler, { CrawlerInterface } from './crawler.model';
 
 import sequelize from '../database';
 import { BuildOptions, DataTypes, Model } from 'sequelize';
+
+export interface RealEstateResponseBody {
+  area: string;
+  buildingStatus: string;
+  imageUrl: string;
+  link: string;
+  price: string;
+  title: string;
+  crawlerId: number;
+}
 
 export interface RealEstateInterface extends Model {
   title: string;
@@ -22,6 +33,7 @@ export interface RealEstateInterface extends Model {
   createdAt: Date;
   updatedAt: Date;
   starred: boolean;
+  crawler: CrawlerInterface;
 }
 
 type ModelStatic = typeof Model & {
@@ -87,5 +99,8 @@ const RealEstate = <ModelStatic>sequelize.define(
 
 RealEstate.belongsTo(Portal);
 Portal.hasMany(RealEstate);
+
+RealEstate.belongsTo(Crawler);
+Crawler.hasMany(RealEstate);
 
 export default RealEstate;

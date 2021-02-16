@@ -1,6 +1,6 @@
 <template>
   <div class="container mx-auto my-10 sm:my-6 lg:grid grid-flow-col grid-cols-main gap-4">
-    <div class="flex justify-content-between flex-column lg:sticky top-20">
+    <div class="flex justify-content-between flex-col lg:sticky top-20">
       <button
         class="bg-white hover:bg-gray-100 text-gray-800 font-semibold py-2 px-4 border border-gray-400 rounded shadow w-full lg:hidden mb-4"
         aria-label="Filter"
@@ -13,27 +13,6 @@
           <Search class="mb-6"></Search>
           <ListSort class="mb-6"></ListSort>
           <ListFilter></ListFilter>
-        </div>
-        <button
-          class="btn btn--primary mt-8"
-          :class="{ 'is-loading': loadingCrawler }"
-          :disabled="loadingCrawler"
-          aria-label="Refresh"
-          @click="onRunCrawler"
-        >
-          <span>Atnaujinti</span>
-          <div class="ml-2 inline-block">
-            <div :class="{ spinning: loadingCrawler }">
-              <span class="icon">
-                <i class="fa fa-refresh"></i>
-              </span>
-            </div>
-          </div>
-        </button>
-        <div class="flex justify-center mt-2">
-          <button class="btn text-xs text-gray-500" aria-label="Clear Filters" @click="onClearFilters">
-            Išvalyti filtrus
-          </button>
         </div>
       </div>
     </div>
@@ -66,7 +45,6 @@
 import ListSort from '../components/Sort';
 import Pagination from '../components/Pagination';
 import List from '../components/List';
-import axios from 'axios';
 import ListFilter from '../components/Filter';
 import Loader from '../components/ui/Loader';
 import { mapActions, mapGetters } from 'vuex';
@@ -86,7 +64,6 @@ export default {
   },
   data() {
     return {
-      loadingCrawler: false,
       filtersVisible: true,
     };
   },
@@ -101,10 +78,13 @@ export default {
         return [[null, this.realEstates]];
       }
       const keyGetter = () => {
-        if (groupByKey === 'portalId') {
-          return item => item.portal.title;
-        } else {
-          return item => moment(item['createdAt']).startOf('day').format('MMMM DD');
+        switch (groupByKey) {
+          case 'portalId':
+            return item => item.portal.title;
+          case 'crawlerId':
+            return item => item.crawler.name;
+          default:
+            return item => moment(item['createdAt']).startOf('day').format('MMMM DD');
         }
       };
       return Object.entries(groupBy(this.realEstates, keyGetter()));
@@ -113,7 +93,7 @@ export default {
   watch: {
     $route: 'getRealEstates',
   },
-  created() {
+  async created() {
     this.getRealEstates();
   },
   methods: {
@@ -123,19 +103,7 @@ export default {
       const queryParams = { direction, page, property, portals, groupBy, term };
       this.fetchRealEstates(queryParams);
     },
-    onRunCrawler() {
-      this.loadingCrawler = true;
-      axios
-        .get(`${process.env.VUE_APP_API_HOST}/api/run-crawler`)
-        .then(() => {
-          this.getRealEstates();
-          this.loadingCrawler = false;
-        })
-        .catch(err => {
-          this.loadingCrawler = false;
-          console.error(err);
-        });
-    },
+
     onClearFilters() {
       router.replace({ path: '', params: undefined }).catch(() => {});
     },

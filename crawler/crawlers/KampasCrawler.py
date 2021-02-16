@@ -19,5 +19,5 @@ class KampasCrawler(Crawler):
 
         return real_estates
 
-    def create_url(self, price_min, price_max):
+    def create_url(self, price_min, price_max, real_estate_type):
         return f"https://www.kampas.lt/namai-vilniuje?priceFrom={price_min}&priceTo={price_max}"

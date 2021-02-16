@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { Op, Sequelize } from 'sequelize';
-import RealEstate, { RealEstateInterface } from '../models/real-estate.model';
+import RealEstate, { RealEstateResponseBody } from "../models/real-estate.model";
 import Portal from '../models/portal.model';
+import Crawler from '../models/crawler.model';
 import { getActivePortals } from './portal.controller';
 
 const SHOW_PER_PAGE = 12;
@@ -13,7 +14,7 @@ export default {
       const { page, property, direction, portals, groupBy, term } = req.query;
       let portalCondition = {};
       let condition = {};
-      let order: any[] = [];
+      const order: any[] = [];
       if (portals) {
         // @TODO: check if portal is active before filtering
         portalCondition = { name: portals.split(',') };
@@ -39,6 +40,10 @@ export default {
             model: Portal,
             as: 'portal',
             where: portalCondition,
+          },
+          {
+            model: Crawler,
+            as: 'crawler',
           },
         ],
       });
@@ -142,7 +147,7 @@ function convertToNumber(value: string): number {
   return +value.replace(/[^0-9\n]/g, '');
 }
 
-export async function postRealEstates(realEstates: RealEstateInterface[]) {
+export async function postRealEstates(realEstates: RealEstateResponseBody[]) {
   return new Promise(async (resolve, reject) => {
     try {
       const promises: Promise<any>[] = [];
@@ -155,7 +160,7 @@ export async function postRealEstates(realEstates: RealEstateInterface[]) {
   });
 }
 
-async function runUpdate(item: any) {
+async function runUpdate(item: RealEstateResponseBody) {
   return new Promise(async (resolve, reject) => {
     try {
       const portalLink = definePortalByLink(item.link);
@@ -166,26 +171,29 @@ async function runUpdate(item: any) {
         return;
       }
 
-      const newItem: RealEstateInterface = {
+      const newItem: any = {
         ...item,
         price: convertToNumber(item.price),
         area: convertToNumber(item.area),
-        priceChangePercentage: item.priceChangePercentage
-          ? +item.priceChangePercentage
-              .toString()
-              .replace(',', '.')
-              .replace(/[^0-9.\n]/g, '')
-          : null,
+        // priceChangePercentage: item.priceChangePercentage
+        //   ? +item.priceChangePercentage
+        //       .toString()
+        //       .replace(',', '.')
+        //       .replace(/[^0-9.\n]/g, '')
+        //   : null,
         new: true,
         portalId: portal.id,
+        crawlerId: item.crawlerId,
         createdAt: Date.now(),
       };
+      // Create new entry
       const foundItem = await RealEstate.findOne({ where: { link: item.link } });
       if (!foundItem) {
         newItem.imagePath = item.imageUrl || null;
         resolve(RealEstate.create(newItem));
         return;
       }
+      // Update existing entry
       let body = {};
       if (foundItem.price !== newItem.price) {
         const priceChangePercentage = +(((foundItem.price - newItem.price) * 100) / foundItem.price).toFixed(2);

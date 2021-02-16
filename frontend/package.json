@@ -5,38 +5,25 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "test": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "build:prod": "vue-cli-service build --mode production",
-    "prettier": "prettier --write ./src && eslint --fix ./src"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
-  },
-  "lint-staged": {
-    "**/*.{js,vue}": [
-      "eslint --fix ./src",
-      "prettier --write ./src"
-    ],
-    "**/*.{json,css,scss}": [
-      "prettier --write ./src"
-    ]
+    "prettier": "prettier --write ./src && eslint --fix ./src",
+    "test": "vue-cli-service test:unit"
   },
   "dependencies": {
-    "autoprefixer": "^9.7.6",
+    "autoprefixer": "^9.8.6",
     "axios": "^0.21.1",
+    "bootstrap-vue": "^2.21.2",
     "core-js": "^3.6.4",
     "debounce": "^1.2.0",
     "dotenv": "^8.2.0",
     "font-awesome": "^4.7.0",
     "moment": "^2.24.0",
+    "postcss": "^7.0.35",
     "register-service-worker": "^1.7.1",
-    "tailwindcss": "^1.2.0",
+    "tailwindcss": "^2.0.1-compat",
     "vue": "2.6.11",
     "vue-router": "^3.1.6",
-    "vue-tailwind": "^0.4.6",
     "vuex": "^3.1.3"
   },
   "devDependencies": {
@@ -63,5 +50,19 @@
   "browserslist": [
     "> 1%",
     "last 2 versions"
-  ]
+  ],
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "**/*.{js,vue}": [
+      "eslint --fix ./src",
+      "prettier --write ./src"
+    ],
+    "**/*.{json,css,scss}": [
+      "prettier --write ./src"
+    ]
+  }
 }

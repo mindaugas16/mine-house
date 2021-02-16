@@ -3,12 +3,10 @@ from bs4 import BeautifulSoup as soup
 
 
 class Crawler:
-    price_min = 50000
-    price_max = 175000
-
-    def __init__(self):
+    def __init__(self, options):
         self.containers = None
         self.page_soup = None
+        self.options = options
 
     def parse_html(self, url):
         u_client = uReq(url)
@@ -18,10 +16,10 @@ class Crawler:
         self.set_data_containers()
 
     def fetch_data(self):
-        self.parse_html(self.create_url(self.price_min, self.price_max))
+        self.parse_html(self.create_url())
         return self.crawl_data()
 
-    def create_url(self, price_min, price_max):
+    def create_url(self):
         pass
 
     def set_data_containers(self):

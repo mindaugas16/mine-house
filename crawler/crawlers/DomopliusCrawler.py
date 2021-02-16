@@ -26,5 +26,5 @@ class DomopliusCrawler(Crawler):
 
         return real_estates
 
-    def create_url(self, price_min, price_max):
+    def create_url(self, price_min, price_max, real_estate_type):
         return f"https://domoplius.lt/skelbimai/namai-kotedzai-sodai?action_type=1&address_1=461&sell_price_from={price_min}&sell_price_to={price_max}"

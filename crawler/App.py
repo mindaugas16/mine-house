@@ -7,11 +7,12 @@ app = Flask(__name__)
 @app.route('/run', methods=['POST'])
 def run_crawlers():
     portals = request.get_json(force=True)["portals"]
+    options = request.get_json(force=True)["options"]
     factory = CrawlerFactory()
     data = []
     for portal in portals:
         try:
-            data.append(factory.create_crawler(portal).fetch_data())
+            data.append(factory.create_crawler(portal, options).fetch_data())
         except AttributeError as err:
             print(err)
             return jsonify(err), 400

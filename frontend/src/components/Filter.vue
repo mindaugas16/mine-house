@@ -10,6 +10,7 @@
             <option value="updatedAt">Atnaujinimo datą</option>
             <option value="lastSeenAt">Paskutinio peržiūrėjimo datą</option>
             <option value="portalId">Portalą</option>
+            <option value="crawlerId">Paiešką</option>
           </select>
           <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
             <span class="icon fill-current h-4 w-4 justify-center flex">
@@ -29,6 +30,7 @@
         </button>
       </div>
     </div>
+
     <div class="flex flex-col">
       <p class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Portalai</p>
       <label
@@ -41,19 +43,30 @@
         <span class="text-sm ml-2">{{ portal.title }} ({{ portal.realEstatesCount }})</span>
       </label>
     </div>
+    <hr class="mt-8 mb-4" />
+    <div class="flex flex-col mb-4">
+      <p class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Paieškos</p>
+      <Crawlers></Crawlers>
+    </div>
   </div>
 </template>
 
 <script>
 import router from '../router';
 import ApiService from '../services/api.service';
+import Crawlers from '@/components/Crawlers';
 
 export default {
   name: 'ListFilter',
+  components: {
+    Crawlers,
+  },
+  props: { crawlers: Array },
   data() {
     return {
       portals: [],
       selectedPortals: [],
+      selectedCrawlers: [],
       groupBy: null,
     };
   },
@@ -68,8 +81,9 @@ export default {
     if (query.portals) {
       this.selectedPortals = query.portals.split(',');
     } else {
-      this.resetFilters();
+      this.resetPortalsFilters();
     }
+
     if (query.groupBy) {
       this.groupBy = query.groupBy;
     }
@@ -86,16 +100,16 @@ export default {
         query: { ...this.$route.query, groupBy: this.groupBy },
       });
     },
-    resetFilters() {
+    resetPortalsFilters() {
       this.selectedPortals = this.portals.map(({ name }) => name);
     },
     onChange() {
       const portals = this.selectedPortals.join();
-      this.appendToRoute(portals);
+      this.appendToRoute({ portals });
     },
-    appendToRoute(portals) {
+    appendToRoute(params) {
       router.replace({
-        query: { ...this.$route.query, page: undefined, portals },
+        query: { ...this.$route.query, ...params, page: undefined },
       });
     },
   },
