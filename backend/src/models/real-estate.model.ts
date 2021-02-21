@@ -1,5 +1,7 @@
 import Portal, { PortalInterface } from './portal.model';
 import Crawler, { CrawlerInterface } from './crawler.model';
+import Price, { PriceInterface } from './price.model';
+import Favorite from './favorite.model';
 
 import sequelize from '../database';
 import { BuildOptions, DataTypes, Model } from 'sequelize';
@@ -9,31 +11,28 @@ export interface RealEstateResponseBody {
   buildingStatus: string;
   imageUrl: string;
   link: string;
-  price: string;
   title: string;
+  price: string;
   crawlerId: number;
 }
 
 export interface RealEstateInterface extends Model {
+  id: number;
   title: string;
   link: string;
-  price: number;
   area: number;
   buildingStatus: number;
   new: boolean;
   portal: PortalInterface;
   lastSeenAt: number;
-  lastPriceChanges: {
-    priceBefore: number;
-    priceAfter: number;
-    changedAt: Date;
-    priceChangePercentage: number;
-  }[];
   imagePath: string;
   createdAt: Date;
   updatedAt: Date;
   starred: boolean;
   crawler: CrawlerInterface;
+  price: number;
+  priceChanges: PriceInterface[];
+  favorite: boolean;
 }
 
 type ModelStatic = typeof Model & {
@@ -53,12 +52,8 @@ const RealEstate = <ModelStatic>sequelize.define(
     title: DataTypes.STRING,
     link: {
       type: DataTypes.STRING,
-      unique: true,
       allowNull: false,
-    },
-    price: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
+      unique: 'uniqueRealEstate',
     },
     area: {
       type: DataTypes.INTEGER,
@@ -69,12 +64,16 @@ const RealEstate = <ModelStatic>sequelize.define(
     new: {
       type: DataTypes.BOOLEAN,
     },
-    starred: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: false,
-    },
     lastSeenAt: {
       type: DataTypes.DATE,
+    },
+    price: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    imagePath: {
+      type: DataTypes.STRING,
+      allowNull: true,
     },
     updatedAt: {
       type: DataTypes.DATE,
@@ -82,14 +81,9 @@ const RealEstate = <ModelStatic>sequelize.define(
     createdAt: {
       type: DataTypes.DATE,
     },
-    lastPriceChanges: {
-      type: DataTypes.ARRAY(DataTypes.TEXT),
-      defaultValue: [],
-    },
-    imagePath: {
-      type: DataTypes.STRING,
-      unique: true,
-      allowNull: true,
+    crawlerId: {
+      type: DataTypes.INTEGER,
+      unique: 'uniqueRealEstate',
     },
   },
   {
@@ -100,7 +94,13 @@ const RealEstate = <ModelStatic>sequelize.define(
 RealEstate.belongsTo(Portal);
 Portal.hasMany(RealEstate);
 
-RealEstate.belongsTo(Crawler);
-Crawler.hasMany(RealEstate);
+RealEstate.belongsTo(Crawler, { onDelete: 'cascade' });
+Crawler.hasMany(RealEstate, { onDelete: 'cascade' });
+
+Price.belongsTo(RealEstate, { onDelete: 'cascade' });
+RealEstate.hasMany(Price, { onDelete: 'cascade' });
+
+Favorite.belongsTo(RealEstate, { onDelete: 'cascade' });
+RealEstate.hasOne(Favorite, { onDelete: 'cascade' });
 
 export default RealEstate;

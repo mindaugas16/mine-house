@@ -5,6 +5,8 @@ const router = Router();
 
 router.get('/', CrawlerController.getAll);
 router.put('/', CrawlerController.create);
-router.post('/run', CrawlerController.run);
+// router.get('/:id', CrawlerController.delete);
+router.delete('/:id', CrawlerController.delete);
+router.post('/:id/run', CrawlerController.run);
 
 export default router;

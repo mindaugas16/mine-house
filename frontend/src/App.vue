@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-    <router-view></router-view>
+    <div class="container mx-auto py-10 sm:py-6">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 

@@ -8,6 +8,7 @@
     "start": "ts-node -r tsconfig-paths/register src/index.ts",
     "sync": "ts-node -r tsconfig-paths/register src/database/sync.ts",
     "seed:all": "sequelize db:seed:all",
+    "migrate": "sequelize db:migrate",
     "build": "tsc -b",
     "test": "jest"
   },

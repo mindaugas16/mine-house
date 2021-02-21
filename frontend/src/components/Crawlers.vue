@@ -1,49 +1,40 @@
 <template>
   <div>
-    <CrawlerModal></CrawlerModal>
-    <ul class="mb-4">
-      <CrawlerItem
-        v-for="crawler in crawlers"
-        :key="crawler.id"
-        :crawler="crawler"
-        :selected="selectedCrawlers.includes(crawler.id)"
-        @toggle="onToggle($event)"
-      ></CrawlerItem>
-    </ul>
-    <div class="flex justify-center">
-      <button class="btn btn--primary" @click="$bvModal.show('crawler-modal')">
-        <span>Sukurti paiešką</span>
-        <span class="ml-2 inline-block icon">
-          <i class="fa fa-plus"></i>
-        </span>
-      </button>
-    </div>
+    <Loader v-if="crawlersLoading"></Loader>
+    <template v-else>
+      <ul v-if="crawlers.length" class="mb-4">
+        <CrawlerItem
+          v-for="crawler in crawlers"
+          :key="crawler.id"
+          :crawler="crawler"
+          :selected="selectedCrawlers.includes(crawler.id)"
+          @delete="onDelete($event)"
+        ></CrawlerItem>
+      </ul>
+      <span v-else class="text-sm text-gray-600">Nieko nerasta.</span>
+    </template>
   </div>
 </template>
 
 <script>
 import CrawlerItem from '@/components/CrawlerItem';
-import CrawlerModal from '../components/CrawlerModal';
 import router from '@/router';
-import ApiService from '@/services/api.service';
+import { mapActions, mapGetters } from 'vuex';
+import Loader from '@/components/ui/Loader';
 
 export default {
   name: 'Crawlers',
-  components: { CrawlerItem, CrawlerModal },
+  components: { Loader, CrawlerItem },
   data() {
     return {
       selectedCrawlers: [],
-      crawlers: [],
     };
   },
+  computed: {
+    ...mapGetters(['crawlers', 'crawlersLoading']),
+  },
   async created() {
-    try {
-      const { data } = await ApiService.get(`/crawlers/`);
-      this.crawlers = data;
-    } catch (err) {
-      console.error(err);
-    }
-
+    await this.fetchCrawlers();
     const query = this.$route.query;
 
     if (query.crawlers) {
@@ -53,16 +44,7 @@ export default {
     }
   },
   methods: {
-    onToggle(crawlerId) {
-      const foundIndex = this.selectedCrawlers.indexOf(crawlerId);
-      if (foundIndex > -1) {
-        this.selectedCrawlers.splice(foundIndex, 1);
-      } else {
-        this.selectedCrawlers.push(crawlerId);
-      }
-      const crawlers = this.selectedCrawlers.sort((a, b) => a - b).join();
-      this.appendToRoute({ crawlers });
-    },
+    ...mapActions(['fetchCrawlers', 'deleteCrawler']),
     reset() {
       this.selectedCrawlers = this.crawlers.map(({ id }) => id);
     },
@@ -70,6 +52,9 @@ export default {
       router.replace({
         query: { ...this.$route.query, ...params, page: undefined },
       });
+    },
+    onDelete(id) {
+      this.deleteCrawler(id);
     },
   },
 };

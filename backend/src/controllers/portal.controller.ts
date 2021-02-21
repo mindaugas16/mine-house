@@ -6,13 +6,15 @@ import { Sequelize } from 'sequelize';
 export default {
   getSupportedPortalsAsFilters: async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const { searchId: crawlerId } = req.query;
+
       const rows = await Portal.findAll({
         where: { active: true },
         order: [['title', 'asc']],
         attributes: {
           include: [[Sequelize.fn('COUNT', Sequelize.col('realEstates.id')), 'realEstatesCount']],
         },
-        include: [{ model: RealEstate, attributes: [] }],
+        include: [{ model: RealEstate, attributes: [], where: { crawlerId } }],
         group: ['portals.id'],
       });
       res.send(rows);

@@ -1,27 +1,29 @@
 <template>
   <li>
-    <div class="flex justify-between">
-      <label :key="crawler.id" class="text-gray-500 hover:text-gray-700 cursor-pointer" :for="crawler.id">
-        <input :id="crawler.id" v-model="isSelected" type="checkbox" @change="$emit('toggle', crawler.id)" />
-        <span class="text-sm ml-2">{{ crawler.name }}</span>
-      </label>
+    <div class="flex justify-between py-2">
+      <router-link :to="'/search/' + crawler.id" class="text-sm hover:underline">
+        {{ crawler.name }}
+      </router-link>
       <div>
+        <router-link :to="'/search/' + crawler.id" class="bg-green-500 hover:bg-green-600 badge py-1">
+          <span>{{ crawler.realEstatesCount }}</span>
+        </router-link>
         <button
-          class="px-2"
+          class="px-2 text-gray-500 hover:text-gray-700"
           :class="{ 'is-loading': loadingCrawler, spinning: loadingCrawler }"
           :disabled="loadingCrawler"
-          @click="onRunCrawler(crawler.id)"
+          @click="onRunCrawler()"
         >
           <span class="icon is-small">
             <i class="fa fa-refresh" aria-hidden="true"></i>
           </span>
         </button>
-        <button :id="itemId" class="px-2">
+        <button :id="itemId" class="px-2 text-gray-500 hover:text-gray-700">
           <span class="icon is-small">
             <i class="fa fa-info" aria-hidden="true"></i>
           </span>
         </button>
-        <b-popover :target="itemId" triggers="hover focus" placement="top">
+        <b-popover :target="itemId" triggers="click blur" placement="left">
           <div class="grid grid-cols-2 gap-4">
             <span class="text-sm font-medium text-gray-400">Pavadinimas</span>
             <span class="text-sm text-gray-900">{{ crawler.name }}</span>
@@ -53,21 +55,31 @@
             </template>
           </div>
         </b-popover>
+        <button class="px-2 text-gray-500 hover:text-gray-700" @click="onCopy()">
+          <span class="icon is-small">
+            <i class="fa fa-pencil" aria-hidden="true"></i>
+          </span>
+        </button>
+        <button class="px-2 text-red-500 hover:text-red-700" @click="onDelete()">
+          <span class="icon is-small">
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </span>
+        </button>
       </div>
     </div>
+    <hr class="mt-2 mb-4" />
   </li>
 </template>
 
 <script>
-import ApiService from '@/services/api.service';
+import { mapActions } from 'vuex';
 
 export default {
   name: 'CrawlerItem',
-  props: { crawler: Object, selected: Boolean },
+  props: { crawler: null },
   data() {
     return {
       loadingCrawler: false,
-      isSelected: this.selected,
     };
   },
   computed: {
@@ -76,14 +88,20 @@ export default {
     },
   },
   methods: {
-    async onRunCrawler(crawlerId) {
-      this.loadingCrawler = true;
-      try {
-        await ApiService.post(`/crawlers/run`, { crawlerId });
-      } catch (err) {
-        console.error(err);
+    ...mapActions(['runCrawler', 'selectCrawler']),
+    async onRunCrawler() {
+      if (this.loadingCrawler) {
+        return;
       }
+      this.loadingCrawler = true;
+      await this.runCrawler(this.crawler.id);
       this.loadingCrawler = false;
+    },
+    onDelete() {
+      this.$emit('delete', this.crawler.id);
+    },
+    onCopy() {
+      this.selectCrawler(this.crawler);
     },
   },
 };

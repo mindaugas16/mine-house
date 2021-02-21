@@ -1,11 +1,22 @@
-import { LOADING, UPDATE_REAL_ESTATE, UPDATE_REAL_ESTATES, UPDATE_REAL_ESTATES_META } from '../mutation-types';
+import {
+  LOADING,
+  SET_REAL_ESTATE,
+  UPDATE_REAL_ESTATE,
+  UPDATE_REAL_ESTATES,
+  UPDATE_REAL_ESTATES_META,
+} from '../mutation-types';
 import ApiService from '../../services/api.service';
+
+function priceChangePercentage(v1, v2) {
+  return (((v1 - v2) / ((v1 + v2) / 2)) * 100).toFixed(2);
+}
 
 export default {
   state: {
     realEstates: [],
     realEstatesMeta: null,
     loading: false,
+    realEstate: null,
   },
   actions: {
     async fetchRealEstates({ commit }, params) {
@@ -13,15 +24,14 @@ export default {
       try {
         const { data } = await ApiService.get(`/real-estates`, params);
         let { data: realEstates, meta: realEstatesMeta } = data;
-        // @TODO: return from BE json instead of json as text
+
         realEstates = realEstates.map(realEstate => {
           return {
             ...realEstate,
-            lastPriceChanges: realEstate.lastPriceChanges
-              .map(row => JSON.parse(row))
-              .sort((a, b) => {
-                return b.changedAt - a.changedAt;
-              }),
+            lastPriceChangeDiffPercentage:
+              realEstate.priceChanges.length > 1
+                ? priceChangePercentage(realEstate.price, realEstate.priceChanges[1].price)
+                : null,
           };
         });
         commit(UPDATE_REAL_ESTATES, realEstates);
@@ -31,6 +41,29 @@ export default {
       }
       commit(LOADING, false);
     },
+    async fetchRealEstate({ commit }, id) {
+      try {
+        const { data } = await ApiService.get(`/real-estates/${id}`);
+
+        const realEstate = {
+          ...data,
+          priceChanges: data.priceChanges.map((item, i) => {
+            return {
+              ...item,
+              diffPercentage: data.priceChanges[i + 1]
+                ? priceChangePercentage(+data.priceChanges[i].price, +data.priceChanges[i + 1].price)
+                : null,
+            };
+          }),
+          lastPriceChangeDiffPercentage:
+            data.priceChanges.length > 1 ? priceChangePercentage(data.price, data.priceChanges[1].price) : null,
+        };
+        commit(SET_REAL_ESTATE, realEstate);
+        return realEstate;
+      } catch (err) {
+        console.error(err);
+      }
+    },
     async markAsSeen({ commit }, id) {
       try {
         const { data: values } = await ApiService.patch(`/real-estates/${id}/mark-as-seen`, {});
@@ -39,10 +72,10 @@ export default {
         console.error(err);
       }
     },
-    async markAsStarred({ commit }, { id, starred }) {
+    async favorite({ commit }, { id, favorite }) {
       try {
-        await ApiService.patch(`/real-estates/${id}/mark-as-starred`, { starred });
-        commit(UPDATE_REAL_ESTATE, { id, values: { starred } });
+        await ApiService.patch(`/real-estates/${id}/favorite`, { favorite });
+        commit(UPDATE_REAL_ESTATE, { id, values: { favorite } });
       } catch (err) {
         console.error(err);
       }
@@ -51,6 +84,9 @@ export default {
   mutations: {
     [LOADING](state, loading) {
       state.loading = loading;
+    },
+    [SET_REAL_ESTATE](state, realEstate) {
+      state.realEstate = realEstate;
     },
     [UPDATE_REAL_ESTATES](state, items) {
       state.realEstates = items;
@@ -73,6 +109,9 @@ export default {
   getters: {
     realEstates(state) {
       return state.realEstates;
+    },
+    realEstate(state) {
+      return state.realEstate;
     },
     realEstatesMeta(state) {
       return state.realEstatesMeta;

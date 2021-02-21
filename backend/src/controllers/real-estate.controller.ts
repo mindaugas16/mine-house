@@ -1,17 +1,26 @@
 import { NextFunction, Request, Response } from 'express';
-import { Op, Sequelize } from 'sequelize';
-import RealEstate, { RealEstateResponseBody } from "../models/real-estate.model";
+import { Op } from 'sequelize';
+import RealEstate, { RealEstateResponseBody } from '../models/real-estate.model';
 import Portal from '../models/portal.model';
 import Crawler from '../models/crawler.model';
 import { getActivePortals } from './portal.controller';
+import Price from '../models/price.model';
+import Favorite from '../models/favorite.model';
 
 const SHOW_PER_PAGE = 12;
 const SUGGESTIONS_LIMIT = 7;
 
+enum sortType {
+  'NEWEST' = 'newest',
+  'UPDATE' = 'update',
+  'CHEAPEST' = 'cheapest',
+  'EXPENSIVE' = 'expensive',
+}
+
 export default {
   getRealEstates: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { page, property, direction, portals, groupBy, term } = req.query;
+      const { page, property, portals, term, searchId } = req.query;
       let portalCondition = {};
       let condition = {};
       const order: any[] = [];
@@ -22,19 +31,28 @@ export default {
         const activePortals = await getActivePortals();
         portalCondition = { name: activePortals.map(({ name }) => name) };
       }
-      if (groupBy) {
-        order.push([groupBy, 'desc']);
-      }
       if (term) {
         condition = { title: { [Op.iLike]: `%${term}%` } };
       }
-      order.push([[property || 'updatedAt', direction || 'desc']]);
+      if (searchId) {
+        condition = { crawlerId: searchId };
+      }
+      switch (property) {
+        case sortType.UPDATE:
+          order.push(['updatedAt', 'desc NULLS LAST']);
+          break;
+        case sortType.CHEAPEST:
+          order.push(['price', 'asc']);
+          break;
+        case sortType.EXPENSIVE:
+          order.push(['price', 'desc']);
+          break;
+        default:
+          order.push(['createdAt', 'desc']);
+          break;
+      }
       const currentPage = page || 1;
       const { rows, count } = await RealEstate.findAndCountAll({
-        order,
-        where: condition,
-        limit: SHOW_PER_PAGE,
-        offset: (currentPage - 1) * SHOW_PER_PAGE,
         include: [
           {
             model: Portal,
@@ -45,7 +63,21 @@ export default {
             model: Crawler,
             as: 'crawler',
           },
+          {
+            model: Favorite,
+            as: 'favorite',
+          },
+          {
+            model: Price,
+            as: 'priceChanges',
+            separate: true,
+            order: [['createdAt', 'desc']],
+          },
         ],
+        order,
+        where: condition,
+        limit: SHOW_PER_PAGE,
+        offset: (currentPage - 1) * SHOW_PER_PAGE,
       });
       const totalPages = Math.ceil(count / SHOW_PER_PAGE) || 1;
 
@@ -63,12 +95,95 @@ export default {
       res.status(400).json(err);
     }
   },
-  markAsStarred: async (req: Request, res: Response, next: NextFunction) => {
+  getFavorites: async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const rows = await Favorite.findAll({
+        include: [
+          {
+            model: RealEstate,
+            as: 'realEstate',
+            include: [
+              {
+                model: Portal,
+                as: 'portal',
+              },
+              {
+                model: Crawler,
+                as: 'crawler',
+              },
+              {
+                model: Favorite,
+                as: 'favorite',
+              },
+              {
+                model: Price,
+                as: 'priceChanges',
+                separate: true,
+                order: [['createdAt', 'desc']],
+              },
+            ],
+          },
+        ],
+      });
+
+      res.send(rows);
+    } catch (err) {
+      res.status(400).json(err);
+    }
+  },
+  getSingleRealEstate: async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
-    const { starred } = req.body;
 
     try {
-      await RealEstate.update({ starred }, { where: { id } });
+      const realEstate = await RealEstate.findOne({
+        include: [
+          {
+            model: Portal,
+            as: 'portal',
+          },
+          {
+            model: Crawler,
+            as: 'crawler',
+          },
+          {
+            model: Favorite,
+            as: 'favorite',
+          },
+          {
+            model: Price,
+            as: 'priceChanges',
+            separate: true,
+            order: [['createdAt', 'desc']],
+          },
+        ],
+        where: { id },
+      });
+      console.log();
+      res.send(realEstate);
+    } catch (err) {
+      res.status(400).json(err);
+    }
+  },
+  favorite: async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const { favorite } = req.body;
+
+    try {
+      if (favorite) {
+        await Favorite.create({ realEstateId: id });
+      } else {
+        await Favorite.destroy({ where: { realEstateId: id } });
+      }
+      res.status(204).send();
+    } catch (err) {
+      res.status(400).json(err);
+    }
+  },
+  delete: async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+
+    try {
+      await RealEstate.destroy({ where: { id } });
       res.status(204).send();
     } catch (err) {
       res.status(400).json(err);
@@ -147,20 +262,20 @@ function convertToNumber(value: string): number {
   return +value.replace(/[^0-9\n]/g, '');
 }
 
-export async function postRealEstates(realEstates: RealEstateResponseBody[]) {
+export async function postRealEstates(realEstates: RealEstateResponseBody[]): Promise<any> {
   return new Promise(async (resolve, reject) => {
     try {
       const promises: Promise<any>[] = [];
       realEstates.forEach(item => promises.push(runUpdate(item)));
-      await Promise.all(promises);
-      resolve({ message: 'Data update successfully' });
+      const newItems = await Promise.all(promises);
+      resolve(newItems);
     } catch (err) {
       reject(err);
     }
   });
 }
 
-async function runUpdate(item: RealEstateResponseBody) {
+async function runUpdate(item: RealEstateResponseBody): Promise<boolean> {
   return new Promise(async (resolve, reject) => {
     try {
       const portalLink = definePortalByLink(item.link);
@@ -170,59 +285,42 @@ async function runUpdate(item: RealEstateResponseBody) {
         reject(new Error('Unable to identify portal'));
         return;
       }
+      const newPrice = convertToNumber(item.price);
 
       const newItem: any = {
         ...item,
-        price: convertToNumber(item.price),
         area: convertToNumber(item.area),
-        // priceChangePercentage: item.priceChangePercentage
-        //   ? +item.priceChangePercentage
-        //       .toString()
-        //       .replace(',', '.')
-        //       .replace(/[^0-9.\n]/g, '')
-        //   : null,
+        price: newPrice,
         new: true,
         portalId: portal.id,
         crawlerId: item.crawlerId,
         createdAt: Date.now(),
       };
       // Create new entry
-      const foundItem = await RealEstate.findOne({ where: { link: item.link } });
-      if (!foundItem) {
+      const foundRealEstate = await RealEstate.findOne({ where: { link: item.link, crawlerId: item.crawlerId } });
+      if (!foundRealEstate) {
         newItem.imagePath = item.imageUrl || null;
-        resolve(RealEstate.create(newItem));
+        const realEstate = await RealEstate.create(newItem);
+        await Price.create({ realEstateId: realEstate.id, price: newPrice });
+        resolve(true);
         return;
       }
       // Update existing entry
-      let body = {};
-      if (foundItem.price !== newItem.price) {
-        const priceChangePercentage = +(((foundItem.price - newItem.price) * 100) / foundItem.price).toFixed(2);
-        body = {
-          ...body,
-          price: newItem.price,
-          lastPriceChanges: Sequelize.fn(
-            'array_append',
-            Sequelize.col('lastPriceChanges'),
-            JSON.stringify({
-              priceBefore: foundItem.price,
-              priceAfter: newItem.price,
-              priceChangePercentage,
-              changedAt: Date.now(),
-            })
-          ),
-        };
+      if (newPrice !== foundRealEstate.price) {
+        await RealEstate.update(
+          {
+            price: newPrice,
+            updatedAt: Date.now(),
+            new: false,
+          },
+          { where: { id: foundRealEstate.id } }
+        );
+        await Price.create({
+          realEstateId: foundRealEstate.id,
+          price: newPrice,
+        });
       }
-
-      if (foundItem.area !== newItem.area) {
-        body = { ...body, area: newItem.area };
-      }
-
-      if (!Object.keys(body).length) {
-        return resolve();
-      }
-      body = { ...body, updatedAt: Date.now(), lastSeenAt: null };
-      const found = await RealEstate.update(body, { where: { link: item.link } });
-      resolve(found);
+      resolve(false);
     } catch (err) {
       reject({ err, message: 'something went wrong' });
     }

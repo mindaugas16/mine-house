@@ -9,10 +9,12 @@ import BootstrapVue from 'bootstrap-vue';
 import ApiService from './services/api.service';
 import './assets/scss/main.scss';
 import './registerServiceWorker';
-
+import VueApexCharts from 'vue-apexcharts';
 import 'bootstrap-vue/dist/bootstrap-vue.css';
 
 Vue.use(BootstrapVue);
+Vue.use(VueApexCharts);
+Vue.component('apexchart', VueApexCharts);
 
 moment.locale('lt');
 Vue.config.productionTip = false;

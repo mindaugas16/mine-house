@@ -33,20 +33,18 @@
 
     <div class="flex flex-col">
       <p class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Portalai</p>
-      <label
-        v-for="portal in portals"
-        :key="portal.id"
-        class="text-gray-500 hover:text-gray-700 cursor-pointer"
-        :for="portal.id"
-      >
-        <input :id="portal.id" v-model="selectedPortals" type="checkbox" :value="portal.name" @change="onChange" />
-        <span class="text-sm ml-2">{{ portal.title }} ({{ portal.realEstatesCount }})</span>
-      </label>
-    </div>
-    <hr class="mt-8 mb-4" />
-    <div class="flex flex-col mb-4">
-      <p class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Paieškos</p>
-      <Crawlers></Crawlers>
+      <template v-if="portals.length">
+        <label
+          v-for="portal in portals"
+          :key="portal.id"
+          class="text-gray-500 hover:text-gray-700 cursor-pointer"
+          :for="portal.id"
+        >
+          <input :id="portal.id" v-model="selectedPortals" type="checkbox" :value="portal.name" @change="onChange" />
+          <span class="text-sm ml-2">{{ portal.title }} ({{ portal.realEstatesCount }})</span>
+        </label>
+      </template>
+      <span v-else class="text-sm text-gray-600">Nieko nerasta.</span>
     </div>
   </div>
 </template>
@@ -54,14 +52,10 @@
 <script>
 import router from '../router';
 import ApiService from '../services/api.service';
-import Crawlers from '@/components/Crawlers';
 
 export default {
   name: 'ListFilter',
-  components: {
-    Crawlers,
-  },
-  props: { crawlers: Array },
+  props: { crawlers: [] },
   data() {
     return {
       portals: [],
@@ -72,7 +66,8 @@ export default {
   },
   async created() {
     try {
-      const { data } = await ApiService.get(`/portals`);
+      const { id } = this.$route.params;
+      const { data } = await ApiService.get(`/portals`, { searchId: id });
       this.portals = data;
     } catch (err) {
       console.error(err);
