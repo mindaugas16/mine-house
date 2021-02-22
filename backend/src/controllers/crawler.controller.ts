@@ -44,33 +44,38 @@ export default {
     try {
       const { id } = req.params;
 
-      const portals = await Portal.findAll({ attributes: ['name'], where: { active: true } });
-      const crawlerOptions = await Crawler.findOne({ where: { id } });
-      if (!crawlerOptions) {
-        throw new Error(`Unable to find crawler with id ${id}`);
-      }
-      // let totalItemsCount = 0;
-      const promises = portals.map(async ({ name }) => {
-        const response = await fetch(`http://${process.env.CRAWLER_HOST}:${process.env.CRAWLER_PORT}/run`, {
-          method: 'POST',
-          body: JSON.stringify({ portals: [name], options: crawlerOptions }),
-          headers: { 'Content-Type': 'application/json' },
-        });
-        if (response.status >= 400 && response.status < 600) {
-          throw new Error('Something went wrong in crawler');
-        }
-        const realEstates = await response.json();
-        if (realEstates && realEstates.length) {
-          const promiseResults = (await postRealEstates(realEstates)) as boolean[];
-          return promiseResults.filter(v => v).length;
-        }
-      });
-      const promisesResults = await Promise.all(promises);
+      const newItems = await runSingleCrawler(id);
 
-      res.send({ newItems: promisesResults.reduce((a, b) => (a || 0) + (b || 0), 0) });
+      res.send({ newItems });
     } catch (err) {
       console.error(err);
       res.status(400).send(err);
     }
   },
 };
+
+export async function runSingleCrawler(id) {
+  const portals = await Portal.findAll({ attributes: ['name'], where: { active: true } });
+  const crawlerOptions = await Crawler.findOne({ where: { id } });
+  if (!crawlerOptions) {
+    throw new Error(`Unable to find crawler with id ${id}`);
+  }
+  const promises = portals.map(async ({ name }) => {
+    const response = await fetch(`http://${process.env.CRAWLER_HOST}:${process.env.CRAWLER_PORT}/run`, {
+      method: 'POST',
+      body: JSON.stringify({ portals: [name], options: crawlerOptions }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    if (response.status >= 400 && response.status < 600) {
+      throw new Error('Something went wrong in crawler');
+    }
+    const realEstates = await response.json();
+    if (realEstates && realEstates.length) {
+      const promiseResults = (await postRealEstates(realEstates)) as boolean[];
+      return promiseResults.filter(v => v).length;
+    }
+  });
+  await Crawler.update({ crawledAt: Date.now() }, { where: { id } });
+  const promisesResults = await Promise.all(promises);
+  return promisesResults.reduce((a, b) => (a || 0) + (b || 0), 0);
+}

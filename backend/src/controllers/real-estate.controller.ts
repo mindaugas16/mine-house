@@ -266,7 +266,11 @@ export async function postRealEstates(realEstates: RealEstateResponseBody[]): Pr
   return new Promise(async (resolve, reject) => {
     try {
       const promises: Promise<any>[] = [];
-      realEstates.forEach(item => promises.push(runUpdate(item)));
+      realEstates
+        .filter((item, index, self) => {
+          return index === self.findIndex(t => t.crawlerId === item.crawlerId && t.link === item.link);
+        })
+        .forEach(item => promises.push(runUpdate(item)));
       const newItems = await Promise.all(promises);
       resolve(newItems);
     } catch (err) {

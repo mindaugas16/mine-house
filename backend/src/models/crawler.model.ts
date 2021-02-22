@@ -16,6 +16,7 @@ export interface CrawlerInterface extends Model {
   roomsMax?: number;
   areaMin?: number;
   areaMax?: number;
+  crawledAt?: Date;
 }
 
 type ModelStatic = typeof Model & {
@@ -61,6 +62,9 @@ const crawler = <ModelStatic>sequelize.define('crawlers', {
   areaMax: {
     type: DataTypes.INTEGER,
     allowNull: true,
+  },
+  crawledAt: {
+    type: DataTypes.DATE,
   },
 });
 

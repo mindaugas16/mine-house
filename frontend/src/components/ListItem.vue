@@ -26,7 +26,7 @@
           alt="Image"
         />
       </div>
-      <div class="flex justify-between flex-1 lg:pl-4 sm:py-4">
+      <div class="flex justify-between flex-1 lg:pl-4 px-0 sm:py-4 md:px-4">
         <div class="flex flex-col justify-between w-full">
           <div class="flex justify-between sm:mb-4">
             <div class="flex-grow">

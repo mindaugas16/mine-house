@@ -1,22 +1,31 @@
 <template>
   <div>
-    <div v-if="!loading && crawler" class="flex gap-4 mb-4">
-      <span v-if="crawler.name" class="border border-blue-400 badge py-1 m-0 text-blue-400 font-bold">
+    <div v-if="!loading && crawler" class="flex gap-4 mb-4 flex-wrap">
+      <span v-if="crawler.name" class="border border-blue-400 badge py-1 m-0 text-blue-400 font-bold whitespace-nowrap">
         {{ crawler.name }}
       </span>
-      <span v-if="crawler.createdAt" class="border border-blue-400 badge py-1 m-0 text-blue-400">
+      <span v-if="crawler.createdAt" class="border border-blue-400 badge py-1 m-0 text-blue-400 whitespace-nowrap">
         {{ crawler.createdAt | date }}
       </span>
-      <span v-if="crawler.realEstateType" class="border border-blue-400 badge py-1 m-0 text-blue-400">
+      <span v-if="crawler.realEstateType" class="border border-blue-400 badge py-1 m-0 text-blue-400 whitespace-nowrap">
         {{ crawler.realEstateType === 'house' ? 'Namas' : 'Butas' }}
       </span>
-      <span v-if="crawler.priceMin || crawler.priceMax" class="border border-blue-400 badge py-1 m-0 text-blue-400">
+      <span
+        v-if="crawler.priceMin || crawler.priceMax"
+        class="border border-blue-400 badge py-1 m-0 text-blue-400 whitespace-nowrap"
+      >
         nuo {{ (crawler.priceMin || 0) | currency }} iki {{ (crawler.priceMax || 0) | currency }}
       </span>
-      <span v-if="crawler.areaMin || crawler.areaMax" class="border border-blue-400 badge py-1 m-0 text-blue-400">
+      <span
+        v-if="crawler.areaMin || crawler.areaMax"
+        class="border border-blue-400 badge py-1 m-0 text-blue-400 whitespace-nowrap"
+      >
         nuo {{ (crawler.areaMin || 0) | area }} iki {{ (crawler.areaMax || 0) | area }}
       </span>
-      <span v-if="crawler.roomsMin || crawler.roomsMax" class="border border-blue-400 badge py-1 m-0 text-blue-400">
+      <span
+        v-if="crawler.roomsMin || crawler.roomsMax"
+        class="border border-blue-400 badge py-1 m-0 text-blue-400 whitespace-nowrap"
+      >
         nuo {{ (crawler.roomsMin || 0)}} iki {{ (crawler.roomsMax || 0) }} kamb.
       </span>
     </div>
