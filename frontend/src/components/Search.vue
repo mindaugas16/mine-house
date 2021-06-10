@@ -1,6 +1,6 @@
 <template>
   <form class="relative w-full search" @submit="onSubmit">
-    <label>
+    <label class="m-0">
       <input
         v-model="value"
         class="search__input"

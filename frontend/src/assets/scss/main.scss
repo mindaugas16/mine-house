@@ -31,16 +31,18 @@ body {
   }
 }
 
+input[type='text'],
+input[type='number'],
 select {
-  @apply block appearance-none w-full bg-gray-200 border border-gray-200 text-gray-700 py-3 px-4 pr-8 rounded leading-tight cursor-pointer;
+  @apply block w-full text-gray-700 border border-gray-100 rounded-md py-3 px-4 leading-tight focus:outline-none focus:border-gray-400 shadow-sm;
 }
 
-input[type='text'],
-input[type='number'] {
-  @apply appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight;
-  &:focus {
-    @apply outline-none bg-white border-gray-500;
-  }
+select {
+  @apply appearance-none;
+}
+
+label {
+  @apply mb-1 ml-1;
 }
 
 .badge {

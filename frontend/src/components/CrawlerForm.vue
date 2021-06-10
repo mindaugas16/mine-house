@@ -1,13 +1,13 @@
 <template>
   <div>
     <form id="create-crawler-form" @submit="onSubmit">
-      <div class="grid grid-cols-5 gap-4">
-        <div class="col-span-3 sm:col-span-3">
+      <div class="grid grid-cols-6 gap-4">
+        <div class="col-span-4">
           <label for="name" class="block text-sm font-medium text-gray-700">Pavadinimas</label>
           <input id="name" v-model="name" type="text" placeholder="Paieškos pavadinimas" />
         </div>
 
-        <div class="col-span-2 sm:col-span-3">
+        <div class="col-span-2">
           <label for="realEstateType" class="block text-sm font-medium text-gray-700">Būsto tipas</label>
           <select id="realEstateType" v-model="realEstateType">
             <option :value="null">Pasirinkite būsto tipą...</option>
@@ -15,42 +15,36 @@
             <option value="apartment">Butas</option>
           </select>
         </div>
-
         <template v-if="realEstateType === 'apartment'">
-          <div class="col-span-6 sm:col-span-6 lg:col-span-2">
-            <label for="rooms-min" class="block text-sm font-medium text-gray-700">Kambariai nuo</label>
-            <input id="rooms-min" v-model="roomsMin" type="number" placeholder="Nuo" min="0" max="5" />
+          <div class="col-span-3">
+            <label for="rooms-min" class="block text-sm font-medium text-gray-700">Kambariai</label>
+            <div class="flex">
+              <input id="rooms-min" class="mr-3" v-model="roomsMin" type="number" placeholder="Nuo" min="0" max="5" />
+              <input id="rooms-max" v-model="roomsMax" type="number" placeholder="Iki" min="0" max="5" />
+            </div>
           </div>
-
-          <div class="col-span-6 sm:col-span-6 lg:col-span-2">
-            <label for="rooms-max" class="block text-sm font-medium text-gray-700">Kambariai iki</label>
-            <input id="rooms-max" v-model="roomsMax" type="number" placeholder="Iki" min="0" max="5" />
-          </div>
-          <div class="clear"></div>
         </template>
 
-        <div class="col-span-6 sm:col-span-6 lg:col-span-2">
-          <label for="price-min" class="block text-sm font-medium text-gray-700">Kaina nuo</label>
-          <input id="price-min" v-model="priceMin" type="number" placeholder="Nuo" min="0" />
+        <div class="col-span-3">
+          <label for="price-min" class="block text-sm font-medium text-gray-700">Kaina</label>
+          <div class="flex">
+            <input id="price-min" class="mr-3" v-model="priceMin" type="number" placeholder="Nuo" min="0" />
+            <input id="price-max" v-model="priceMax" type="number" placeholder="Iki" min="0" />
+          </div>
         </div>
 
-        <div class="col-span-6 sm:col-span-6 lg:col-span-2">
-          <label for="price-max" class="block text-sm font-medium text-gray-700">Kaina iki</label>
-          <input id="price-max" v-model="priceMax" type="number" placeholder="Iki" min="0" />
-        </div>
-        <div class="clear"></div>
-
-        <div class="col-span-6 sm:col-span-6 lg:col-span-2">
-          <label for="area-min" class="block text-sm font-medium text-gray-700">Plotas nuo</label>
-          <input id="area-min" v-model="areaMin" type="number" placeholder="Nuo" min="0" />
-        </div>
-        <div class="col-span-6 sm:col-span-6 lg:col-span-2">
-          <label for="area-max" class="block text-sm font-medium text-gray-700">Plotas iki</label>
-          <input id="area-max" v-model="areaMax" type="number" placeholder="Iki" min="0" />
+        <div class="col-span-3">
+          <label for="area-min" class="block text-sm font-medium text-gray-700">Plotas</label>
+          <div class="flex">
+            <input id="area-min" class="mr-3" v-model="areaMin" type="number" placeholder="Nuo" min="0" />
+            <input id="area-max" v-model="areaMax" type="number" placeholder="Iki" min="0" />
+          </div>
         </div>
       </div>
     </form>
-    <button class="btn btn--primary mt-3" type="submit" form="create-crawler-form">Išsaugoti</button>
+    <div class="flex justify-end">
+      <button class="btn btn--primary mt-3" type="submit" form="create-crawler-form">Išsaugoti</button>
+    </div>
   </div>
 </template>
 

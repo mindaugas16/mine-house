@@ -46,7 +46,7 @@ export default {
       try {
         const { data } = await ApiService.post(`/crawlers/${id}/run`, {});
 
-        commit(PATCH_CRAWLER, { id, newItems: data.newItems });
+        commit(PATCH_CRAWLER, { id, newItems: data.newItems, crawledAt: Date.now() });
       } catch (err) {
         console.error(err);
       }
