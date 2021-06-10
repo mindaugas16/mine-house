@@ -20,7 +20,7 @@
     "dotenv": "^8.2.0",
     "font-awesome": "^4.7.0",
     "moment": "^2.24.0",
-    "postcss": "^7.0.35",
+    "postcss": "^8.2.10",
     "register-service-worker": "^1.7.1",
     "tailwindcss": "^2.0.1-compat",
     "vue": "2.6.11",
